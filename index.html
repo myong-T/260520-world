@@ -71,10 +71,11 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 
 .country{fill:#1a3d5c;stroke:#0a1628;stroke-width:.5;cursor:pointer;transition:fill .2s}
 .country:hover{fill:#2a5a80}
-.country.conquered{fill:#1a4d3a}
-.country.failed{fill:#3d1a1a}
-.country.giveup{fill:#2a1a2a}
+.country.conquered{fill:#1a4d3a !important}
+.country.failed{fill:#3d1a1a !important}
+.country.giveup{fill:#2a1a2a !important}
 .country.active-q{stroke:var(--accent);stroke-width:1.5}
+#r-korea, #r-pacific{fill:#102840;stroke:#2a6080}
 .map-pin{pointer-events:none;text-anchor:middle;dominant-baseline:middle;animation:pinPop .4s cubic-bezier(.34,1.56,.64,1)}
 @keyframes pinPop{from{transform:scale(0)}to{transform:scale(1)}}
 .country-label{pointer-events:none;fill:#4a7a9b;text-anchor:middle;dominant-baseline:middle;font-family:'Noto Sans KR',sans-serif}
@@ -229,7 +230,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 
         <!-- 한국 -->
         <ellipse class="country" id="r-korea" cx="762" cy="152" rx="15" ry="12"
-          data-region="korea" style="fill:#102840;stroke:#2a6080;stroke-width:1.2"/>
+          data-region="korea"/>
 
         <!-- 오세아니아 -->
         <path class="country" id="r-australia" data-region="australia"
@@ -239,7 +240,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 
         <!-- 태평양 -->
         <ellipse class="country" id="r-pacific" cx="910" cy="272" rx="45" ry="32"
-          data-region="pacific" style="fill:#102840;stroke:#1a4060"/>
+          data-region="pacific"/>
 
         <!-- 라벨 -->
         <text class="country-label" font-size="10" x="175" y="85">캐나다</text>
