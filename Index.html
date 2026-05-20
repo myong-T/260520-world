@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>신재생 에너지 퀴즈</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Black+Han+Sans&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0F1923;
+  --surface: #1A2535;
+  --surface2: #223044;
+  --border: #2E4060;
+  --text: #F0F4FF;
+  --text-sub: #8BA0BC;
+  --text-muted: #4A6080;
+  --accent: #4ECDC4;
+  --accent2: #FFE66D;
+  --accent3: #FF6B6B;
+  --green: #2ECC71;
+  --green-dim: #1A3D2B;
+  --red: #E74C3C;
+  --red-dim: #3D1A1A;
+  --combo1: #FFE66D;
+  --combo2: #FF9F43;
+  --combo3: #FF6B6B;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 16px;
+  overflow-x: hidden;
+}
+
+/* 배경 별 */
+.stars { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+.star { position: absolute; border-radius: 50%; background: #fff; opacity: 0; animation: twinkle var(--d) var(--delay) infinite; }
+@keyframes twinkle { 0%,100%{opacity:0} 50%{opacity:var(--op)} }
+
+.wrap { position: relative; z-index: 1; width: 100%; max-width: 560px; }
+
+/* ── SCREENS ── */
+.screen { display: none; animation: popIn .4s cubic-bezier(.34,1.56,.64,1); }
+.screen.active { display: block; }
+@keyframes popIn { from{opacity:0;transform:scale(.94)} to{opacity:1;transform:scale(1)} }
+
+/* ── START ── */
+.start-wrap { text-align: center; }
+.planet {
+  font-size: 72px;
+  margin-bottom: 16px;
+  display: block;
+  animation: float 3s ease-in-out infinite;
+  filter: drop-shadow(0 0 24px rgba(78,205,196,.5));
+}
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
+.game-title {
+  font-family: 'Black Han Sans', sans-serif;
+  font-size: 32px;
+  letter-spacing: -.01em;
+  line-height: 1.2;
+  margin-bottom: 6px;
+  background: linear-gradient(135deg, #4ECDC4, #FFE66D);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.game-sub { font-size: 14px; color: var(--text-sub); margin-bottom: 28px; }
+.info-grid {
+  display: grid; grid-template-columns: repeat(3,1fr); gap: 10px;
+  margin-bottom: 28px;
+}
+.info-box {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 14px; padding: 14px 8px; text-align: center;
+}
+.info-num { font-family: 'Black Han Sans', sans-serif; font-size: 26px; color: var(--accent); }
+.info-lbl { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+.tag-row { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-bottom: 28px; }
+.tag-pill {
+  font-size: 12px; font-weight: 700; padding: 4px 12px; border-radius: 20px;
+  background: var(--surface2); border: 1px solid var(--border); color: var(--text-sub);
+}
+.start-btn {
+  width: 100%; padding: 16px; font-size: 17px; font-weight: 900;
+  font-family: 'Black Han Sans', sans-serif; letter-spacing: .05em;
+  background: linear-gradient(135deg, #4ECDC4, #44A08D);
+  color: #0F1923; border: none; border-radius: 14px; cursor: pointer;
+  box-shadow: 0 4px 24px rgba(78,205,196,.4);
+  transition: transform .15s, box-shadow .15s;
+}
+.start-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(78,205,196,.5); }
+.start-btn:active { transform: translateY(0); }
+
+/* ── QUIZ ── */
+.quiz-top {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 12px;
+}
+.q-num { font-family: 'Black Han Sans', sans-serif; font-size: 14px; color: var(--text-sub); }
+.q-num span { font-size: 18px; color: var(--accent); }
+.score-box {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 20px; padding: 5px 14px; font-size: 13px; color: var(--text-sub);
+  display: flex; align-items: center; gap: 8px;
+}
+.score-box b { color: var(--accent2); font-size: 15px; }
+
+/* 타이머 */
+.timer-wrap { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.timer-ring { position: relative; width: 44px; height: 44px; flex-shrink: 0; }
+.timer-ring svg { transform: rotate(-90deg); }
+.timer-bg { fill: none; stroke: var(--surface2); stroke-width: 4; }
+.timer-arc { fill: none; stroke-width: 4; stroke-linecap: round; stroke: var(--accent); stroke-dasharray: 113; stroke-dashoffset: 0; transition: stroke-dashoffset .9s linear, stroke .3s; }
+.timer-num { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: 'Black Han Sans', sans-serif; font-size: 15px; color: var(--accent); transition: color .3s; }
+.timer-bar-wrap { flex: 1; height: 6px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
+.timer-bar { height: 100%; border-radius: 3px; background: var(--accent); transition: width .9s linear, background .3s; }
+
+/* 콤보 배너 */
+.combo-banner {
+  text-align: center; height: 32px; margin-bottom: 8px;
+  display: flex; align-items: center; justify-content: center;
+}
+.combo-text {
+  font-family: 'Black Han Sans', sans-serif; font-size: 18px;
+  padding: 2px 16px; border-radius: 20px;
+  animation: comboPop .4s cubic-bezier(.34,1.56,.64,1);
+  display: none;
+}
+@keyframes comboPop { from{transform:scale(0) rotate(-8deg)} to{transform:scale(1) rotate(0)} }
+
+/* 진행바 */
+.pbar-bg {
+  height: 8px; background: var(--surface); border-radius: 4px;
+  margin-bottom: 16px; overflow: hidden; border: 1px solid var(--border);
+}
+.pbar-fill {
+  height: 100%; border-radius: 4px;
+  background: linear-gradient(90deg, #4ECDC4, #FFE66D);
+  transition: width .5s cubic-bezier(.34,1.56,.64,1);
+  position: relative;
+}
+.pbar-fill::after {
+  content: ''; position: absolute; right: 0; top: 0; bottom: 0;
+  width: 8px; border-radius: 4px;
+  background: rgba(255,255,255,.6);
+  animation: shine 1.5s infinite;
+}
+@keyframes shine { 0%,100%{opacity:0} 50%{opacity:1} }
+
+/* 문제 카드 */
+.q-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 16px; padding: 22px 20px; margin-bottom: 12px;
+  position: relative; overflow: hidden;
+}
+.q-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, #4ECDC4, #FFE66D);
+}
+.q-type-tag {
+  display: inline-block; font-size: 11px; font-weight: 700;
+  padding: 3px 10px; border-radius: 6px; margin-bottom: 10px;
+  letter-spacing: .06em;
+}
+.q-label { font-size: 12px; color: var(--text-sub); margin-bottom: 8px; letter-spacing: .04em; }
+.q-text { font-size: 15px; line-height: 1.7; font-weight: 700; color: #FFFFFF; }
+
+/* 보기 */
+.opts { display: grid; gap: 8px; margin-bottom: 10px; }
+.opts.two-col { grid-template-columns: 1fr 1fr; }
+.opt {
+  padding: 12px 14px; background: var(--surface2);
+  border: 1.5px solid var(--border); border-radius: 12px;
+  cursor: pointer; font-size: 13px; font-family: 'Noto Sans KR', sans-serif;
+  color: var(--text); text-align: left; line-height: 1.5;
+  transition: border-color .15s, background .15s, transform .1s;
+}
+.opt:hover:not(:disabled) { border-color: var(--accent); background: #1E3A4A; transform: translateY(-1px); }
+.opt.ok {
+  border-color: var(--green); background: var(--green-dim); color: #2ECC71;
+  font-weight: 500; animation: correctPulse .4s ease;
+}
+@keyframes correctPulse { 0%{transform:scale(1)} 50%{transform:scale(1.03)} 100%{transform:scale(1)} }
+.opt.ng { border-color: var(--red); background: var(--red-dim); color: #E74C3C; }
+.opt.reveal { border-color: var(--green); background: var(--green-dim); color: #2ECC71; opacity: .7; }
+
+/* 피드백 */
+.feedback {
+  font-size: 13px; padding: 10px 14px; border-radius: 10px;
+  margin-bottom: 10px; display: none; line-height: 1.6; font-weight: 500;
+}
+.feedback.show { display: block; }
+.feedback.ok { background: var(--green-dim); color: var(--green); border: 1px solid #2ECC7140; }
+.feedback.ng { background: var(--red-dim); color: var(--red); border: 1px solid #E74C3C40; }
+
+/* 다음 버튼 */
+.next-btn {
+  width: 100%; padding: 13px; font-size: 15px; font-weight: 700;
+  font-family: 'Black Han Sans', sans-serif; letter-spacing: .04em;
+  background: var(--accent2); color: #1A1A1A;
+  border: none; border-radius: 12px; cursor: pointer; display: none;
+  transition: transform .15s, opacity .15s;
+}
+.next-btn:hover { transform: translateY(-1px); opacity: .9; }
+.next-btn.show { display: block; animation: popIn .3s ease; }
+
+/* ── 파티클 ── */
+.particle-container { position: fixed; inset: 0; pointer-events: none; z-index: 999; }
+.particle {
+  position: absolute; border-radius: 50%; pointer-events: none;
+  animation: particleFly var(--dur) ease-out forwards;
+}
+@keyframes particleFly {
+  0%   { transform: translate(0,0) scale(1); opacity: 1; }
+  100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+}
+
+/* ── RESULT ── */
+.result-wrap {}
+.result-hero {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 20px; padding: 32px 24px; text-align: center; margin-bottom: 12px;
+  position: relative; overflow: hidden;
+}
+.result-hero::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+  background: linear-gradient(90deg, #4ECDC4, #FFE66D, #FF6B6B);
+}
+.result-trophy { font-size: 56px; margin-bottom: 10px; display: block; animation: float 2s ease-in-out infinite; }
+.rank-badge {
+  display: inline-block; font-family: 'Black Han Sans', sans-serif;
+  font-size: 20px; padding: 6px 20px; border-radius: 30px; margin-bottom: 10px;
+}
+.result-title { font-size: 16px; color: var(--text-sub); margin-bottom: 20px; }
+.result-stats {
+  display: grid; grid-template-columns: repeat(3,1fr); gap: 0;
+  border: 1px solid var(--border); border-radius: 14px; overflow: hidden; margin-bottom: 20px;
+}
+.rs-item { padding: 16px 8px; text-align: center; border-right: 1px solid var(--border); }
+.rs-item:last-child { border-right: none; }
+.rs-val { font-family: 'Black Han Sans', sans-serif; font-size: 26px; margin-bottom: 4px; }
+.rs-lbl { font-size: 11px; color: var(--text-muted); }
+
+/* 최고 콤보 */
+.max-combo-box {
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 12px; padding: 12px 16px; margin-bottom: 12px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.max-combo-box .lbl { font-size: 13px; color: var(--text-sub); }
+.max-combo-box .val { font-family: 'Black Han Sans', sans-serif; font-size: 20px; color: var(--combo1); }
+
+/* 오답 노트 */
+.wrong-log { margin-bottom: 16px; }
+.log-title {
+  font-size: 12px; font-weight: 700; letter-spacing: .06em;
+  color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;
+}
+.log-list { display: flex; flex-direction: column; gap: 6px; max-height: 220px; overflow-y: auto; }
+.log-item {
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 10px; padding: 10px 12px; font-size: 12px; line-height: 1.5;
+  display: flex; gap: 8px; align-items: flex-start;
+}
+.log-item.ok { border-color: #2ECC7130; }
+.log-item.ng { border-color: #E74C3C30; }
+.log-icon { font-size: 14px; flex-shrink: 0; }
+.log-energy { font-weight: 700; color: var(--accent); display: block; }
+.log-q { color: var(--text-sub); }
+
+.result-actions { display: flex; flex-direction: column; gap: 8px; }
+.act-btn {
+  width: 100%; padding: 13px; font-size: 15px; font-weight: 700;
+  font-family: 'Black Han Sans', sans-serif; letter-spacing: .04em;
+  border-radius: 12px; cursor: pointer; transition: transform .15s, opacity .15s;
+}
+.act-btn:hover { transform: translateY(-1px); opacity: .9; }
+.act-btn.primary { background: linear-gradient(135deg,#4ECDC4,#44A08D); color: #0F1923; border: none; }
+.act-btn.secondary { background: transparent; color: var(--text-sub); border: 1px solid var(--border); }
+
+/* 태그 색상 */
+.tag-원리  { background:#1a2a4a; color:#60A5FA; }
+.tag-특징  { background:#2a1a4a; color:#A78BFA; }
+.tag-장점  { background:#1a3a2a; color:#34D399; }
+.tag-단점  { background:#3a1a1a; color:#F87171; }
+.tag-설치  { background:#3a2a1a; color:#FBBF24; }
+.tag-비교  { background:#2a1a3a; color:#E879F9; }
+</style>
+</head>
+<body>
+
+<!-- 배경 별 -->
+<div class="stars" id="stars"></div>
+<!-- 파티클 컨테이너 -->
+<div class="particle-container" id="particles"></div>
+
+<div class="wrap">
+
+  <!-- ── START ── -->
+  <div class="screen active" id="screen-start">
+    <div class="start-wrap">
+      <span class="planet">🌍</span>
+      <div class="game-title">신재생 에너지<br>퀴즈 챌린지!</div>
+      <div class="game-sub">14종 에너지의 비밀을 얼마나 알고 있나요?</div>
+      <div class="info-grid">
+        <div class="info-box"><div class="info-num">126</div><div class="info-lbl">전체 문제</div></div>
+        <div class="info-box"><div class="info-num">20</div><div class="info-lbl">출제 문제</div></div>
+        <div class="info-box"><div class="info-num">14</div><div class="info-lbl">에너지 종류</div></div>
+      </div>
+      <div class="tag-row">
+        <span class="tag-pill">원리</span><span class="tag-pill">특징</span>
+        <span class="tag-pill">장점</span><span class="tag-pill">단점</span>
+        <span class="tag-pill">설치</span><span class="tag-pill">비교</span>
+      </div>
+      <button class="start-btn" onclick="startQuiz()">🚀 퀴즈 시작하기!</button>
+    </div>
+  </div>
+
+  <!-- ── QUIZ ── -->
+  <div class="screen" id="screen-quiz">
+    <div class="quiz-top">
+      <div class="q-num"><span id="qn">1</span> / 20</div>
+      <div class="score-box">점수 <b id="score">0</b></div>
+    </div>
+    <div class="timer-wrap">
+      <div class="timer-ring">
+        <svg width="44" height="44" viewBox="0 0 44 44">
+          <circle class="timer-bg" cx="22" cy="22" r="18"/>
+          <circle class="timer-arc" id="timer-arc" cx="22" cy="22" r="18"/>
+        </svg>
+        <div class="timer-num" id="timer-num">10</div>
+      </div>
+      <div class="timer-bar-wrap">
+        <div class="timer-bar" id="timer-bar" style="width:100%"></div>
+      </div>
+    </div>
+    <div class="combo-banner"><div class="combo-text" id="combo-text"></div></div>
+    <div class="pbar-bg"><div class="pbar-fill" id="pf" style="width:0%"></div></div>
+    <div class="q-card">
+      <div class="q-type-tag" id="qtag"></div>
+      <div class="q-label" id="ql"></div>
+      <div class="q-text" id="qt"></div>
+    </div>
+    <div class="opts" id="og"></div>
+    <div class="feedback" id="fb"></div>
+    <button class="next-btn" id="nb" onclick="nextQ()"></button>
+  </div>
+
+  <!-- ── RESULT ── -->
+  <div class="screen" id="screen-result">
+    <div class="result-hero">
+      <span class="result-trophy" id="re"></span>
+      <div class="rank-badge" id="rank-badge"></div>
+      <div class="result-title" id="result-title"></div>
+      <div class="result-stats">
+        <div class="rs-item">
+          <div class="rs-val" style="color:var(--green)" id="res-c">0</div>
+          <div class="rs-lbl">정답</div>
+        </div>
+        <div class="rs-item">
+          <div class="rs-val" style="color:var(--red)" id="res-w">0</div>
+          <div class="rs-lbl">오답</div>
+        </div>
+        <div class="rs-item">
+          <div class="rs-val" style="color:var(--accent2)" id="res-p">0%</div>
+          <div class="rs-lbl">정확도</div>
+        </div>
+      </div>
+      <div class="max-combo-box">
+        <span class="lbl">🔥 최고 콤보</span>
+        <span class="val" id="max-combo">0연속</span>
+      </div>
+    </div>
+    <div class="wrong-log" id="wrong-log-wrap">
+      <div class="log-title">📋 풀이 기록</div>
+      <div class="log-list" id="log-list"></div>
+    </div>
+    <div class="result-actions">
+      <button class="act-btn primary" onclick="goHome()">🏠 처음으로 돌아가기</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ── 배경 별 생성 ── */
+(function(){
+  const c = document.getElementById('stars');
+  for(let i=0;i<80;i++){
+    const s = document.createElement('div');
+    s.className = 'star';
+    const size = Math.random()*2+1;
+    s.style.cssText = `width:${size}px;height:${size}px;left:${Math.random()*100}%;top:${Math.random()*100}%;--d:${2+Math.random()*3}s;--delay:${Math.random()*4}s;--op:${.3+Math.random()*.5}`;
+    c.appendChild(s);
+  }
+})();
+
+/* ── 문제 데이터 ── */
+const E = [
+  { id:'solar_pv', icon:'☀️', name:'태양광', facts:[
+    {type:'원리', q:'태양 전지판(반도체 소자)으로 빛을 전기로 직접 변환하며, 터빈이나 발전기가 필요 없다'},
+    {type:'원리', q:'광전 효과를 이용해 태양에서 오는 빛 에너지를 전기 에너지로 바꾼다'},
+    {type:'특징', q:'태양전지 모듈은 움직이는 부품이 없어 고장이 거의 없고 유지보수가 매우 적다'},
+    {type:'특징', q:'가정 옥상이나 건물 외벽에 설치해 소규모 분산 발전이 가능하다'},
+    {type:'특징', q:'실리콘 반도체를 주재료로 사용하며, 모듈을 직렬·병렬로 연결해 용량을 조절한다'},
+    {type:'장점', q:'한번 설치하면 20년 이상 연료비 없이 전기를 생산할 수 있다'},
+    {type:'장점', q:'발전 과정에서 소음이 전혀 없고 온실가스를 배출하지 않는다'},
+    {type:'단점', q:'넓은 설치 면적이 필요하고 패널 생산 시 환경 부담이 발생한다'},
+    {type:'단점', q:'발전량이 일조량에 따라 달라져 전력 공급이 불안정하고 별도의 에너지 저장 장치가 필요하다'},
+    {type:'설치', q:'일조량이 풍부하고 그늘이 없는 남향 경사면이나 옥상에 설치하면 효율이 높다'},
+  ]},
+  { id:'solar_th', icon:'🌞', name:'태양열', facts:[
+    {type:'원리', q:'반사경으로 햇빛을 한곳에 모아 1000℃의 고온 열을 만들고 증기로 터빈을 돌린다'},
+    {type:'원리', q:'집열판이 태양열을 흡수해 열매체(물·공기)를 가열하고, 이 열로 온수·냉난방을 공급한다'},
+    {type:'특징', q:'집열판에 열을 저장해 온수 공급 및 냉·난방에 직접 활용할 수 있다'},
+    {type:'특징', q:'태양광과 달리 열 에너지 형태로 저장이 가능해 저녁에도 일부 활용할 수 있다'},
+    {type:'장점', q:'설치 구조가 단순하고 유지 관리가 쉬워 운영 비용이 낮다'},
+    {type:'장점', q:'화석연료 없이 냉난방과 급탕을 해결할 수 있어 건물 에너지 절감 효과가 크다'},
+    {type:'단점', q:'대규모 반사경을 가동하려면 넓은 사막 부지가 필요해 초기 토지 확보 비용이 매우 높다'},
+    {type:'단점', q:'반사경이 새나 항공기에 영향을 줄 수 있고, 집열탑 주변 고온으로 안전 문제가 발생한다'},
+    {type:'설치', q:'반사경 어레이를 넓게 펼쳐야 해서 일사량이 풍부한 사막 지역에 주로 설치된다'},
+    {type:'비교', q:'태양광이 빛을 전기로 직접 변환하는 것과 달리, 태양열은 빛을 열로 먼저 변환한 뒤 활용한다'},
+  ]},
+  { id:'geo', icon:'🌋', name:'지열', facts:[
+    {type:'원리', q:'지하를 시추해 지구 내부의 열로 생성된 온수와 증기를 직접 뽑아올려 발전에 사용한다'},
+    {type:'원리', q:'지하 수백~수천 미터에서 올라오는 증기로 터빈을 돌려 전기를 생산한다'},
+    {type:'특징', q:'지구 내부의 방사성 원소 붕괴열과 지구 형성 초기의 열이 에너지원이다'},
+    {type:'특징', q:'발전 후 남은 온수를 지역 난방이나 온실 농업에도 활용할 수 있다'},
+    {type:'장점', q:'햇빛이나 바람이 없어도 지구 내부 열이 지속적으로 공급되어 에너지 잠재력이 무한하다'},
+    {type:'장점', q:'날씨와 계절에 관계없이 24시간 안정적으로 전기를 생산할 수 있다'},
+    {type:'단점', q:'화산이나 지각활동이 활발한 지역에만 개발이 가능해 설치 지역이 크게 한정된다'},
+    {type:'단점', q:'초기 시추 및 탐사 비용이 매우 높고 잘못 시추하면 지반 침하 위험이 있다'},
+    {type:'설치', q:'아이슬란드, 뉴질랜드처럼 화산활동이 활발한 지역이나 지열 자원이 풍부한 곳에 적합하다'},
+  ]},
+  { id:'wind', icon:'💨', name:'풍력', facts:[
+    {type:'원리', q:'바람의 운동 에너지로 블레이드(날개)를 회전시켜 발전기를 돌려 전기를 생산한다'},
+    {type:'원리', q:'풍속이 빠를수록 블레이드에 작용하는 힘이 커져 더 많은 전기를 생산할 수 있다'},
+    {type:'특징', q:'육상(온쇼어)과 해상(오프쇼어) 두 가지 방식으로 설치할 수 있다'},
+    {type:'특징', q:'해상 풍력은 육상보다 바람이 강하고 일정해 발전 효율이 더 높다'},
+    {type:'장점', q:'산·바다·농지 위 등 다양한 지형에 설치할 수 있어 국토를 효율적으로 이용할 수 있다'},
+    {type:'장점', q:'발전 단가가 점차 낮아져 태양광과 함께 재생에너지 중 경제성이 가장 높다'},
+    {type:'단점', q:'풍속이 4m/s 이상인 곳에만 설치할 수 있어 바람이 적은 내륙에는 부적합하다'},
+    {type:'단점', q:'터빈 회전 시 소음과 진동이 발생해 인근 주민 민원의 원인이 된다'},
+    {type:'단점', q:'회전하는 블레이드에 철새와 조류가 충돌하는 사고가 발생할 수 있다'},
+    {type:'설치', q:'바람이 많은 섬이나 해안가, 산 능선에 주로 설치되며 풍속이 고른 곳이 유리하다'},
+  ]},
+  { id:'hydro', icon:'💧', name:'수력', facts:[
+    {type:'원리', q:'댐에 가둔 물의 위치 에너지를 낙하시켜 회전력으로 바꾼 뒤 발전기를 돌려 전기를 생산한다'},
+    {type:'원리', q:'수문을 열어 물이 떨어지는 낙차와 유량이 클수록 더 많은 전력을 생산한다'},
+    {type:'특징', q:'양수 발전소는 전력이 남을 때 물을 상부 저수지로 올렸다가 필요 시 방류해 전기를 만든다'},
+    {type:'특징', q:'재생에너지 중 가장 오랜 역사를 가지며 전 세계적으로 가장 많이 보급된 방식이다'},
+    {type:'장점', q:'전력 수요에 맞춰 발전량을 빠르게 조절할 수 있고 운전 비용이 매우 낮다'},
+    {type:'장점', q:'한 번 건설하면 50~100년 이상 장기간 운영할 수 있어 경제성이 높다'},
+    {type:'단점', q:'댐이 하천의 흐름을 막아 어류 이동을 차단하고 수중 생태계를 단절시킨다'},
+    {type:'단점', q:'댐 건설을 위해 넓은 지역이 수몰되어 주민 이주와 문화재 침수 문제가 발생한다'},
+    {type:'단점', q:'가뭄이 지속되면 저수량이 줄어 발전량이 급격히 감소할 수 있다'},
+    {type:'설치', q:'강의 낙차가 크고 유량이 풍부한 산악 지역이나 하천 협곡에 주로 건설된다'},
+  ]},
+  { id:'waste', icon:'♻️', name:'폐기물', facts:[
+    {type:'원리', q:'생활·산업 쓰레기를 소각하거나 가스화해 열 에너지 또는 전기를 생산한다'},
+    {type:'원리', q:'매립지에서 발생하는 메탄가스(LFG)를 포집해 발전 연료로 활용하기도 한다'},
+    {type:'특징', q:'폐기물을 에너지로 전환하는 자원순환형 에너지로, 쓰레기 감량과 에너지 생산을 동시에 달성한다'},
+    {type:'특징', q:'소각열을 주변 건물 난방에 공급하는 열병합 방식으로 운영하면 효율이 높아진다'},
+    {type:'장점', q:'에너지를 생산하면서 동시에 폐기물 매립·처리 문제를 해결할 수 있다'},
+    {type:'장점', q:'원료인 폐기물이 지속적으로 발생하므로 연료 수급이 안정적이다'},
+    {type:'단점', q:'소각 과정에서 다이옥신 등 유해가스가 발생할 수 있어 대기오염 대책이 필요하다'},
+    {type:'단점', q:'소각 시설 초기 건설 비용이 매우 높고 주민 수용성(님비 현상)이 낮다'},
+    {type:'설치', q:'폐기물 발생량이 많은 대도시 근처에 설치하면 수송 비용을 줄이고 효율을 높일 수 있다'},
+  ]},
+  { id:'bio', icon:'🌿', name:'바이오', facts:[
+    {type:'원리', q:'식물·동물 등 유기성 생물체(바이오매스)를 발효·가스화해 바이오디젤, 메탄가스 등 연료로 만든다'},
+    {type:'원리', q:'미생물이 유기물을 분해할 때 발생하는 바이오가스(주성분: 메탄)를 포집해 에너지로 활용한다'},
+    {type:'특징', q:'바이오매스에는 목재, 농업 부산물, 음식물 쓰레기, 축산 분뇨 등 다양한 원료가 포함된다'},
+    {type:'특징', q:'바이오디젤, 바이오알코올, 바이오메탄가스, 바이오메탄올 등 다양한 연료 형태로 변환된다'},
+    {type:'장점', q:'물과 적정 온도 조건만 갖추면 지역에 관계없이 어느 곳에서나 생산할 수 있다'},
+    {type:'장점', q:'기존 화석연료 인프라(파이프라인, 엔진)를 일부 그대로 활용할 수 있다'},
+    {type:'단점', q:'넓은 농경지가 필요해 식량 생산과 토지를 두고 경쟁하며 환경 파괴 위험이 있다'},
+    {type:'단점', q:'바이오매스 연소 시 이산화탄소가 발생하며, 탄소 중립 여부는 생산 방식에 따라 다르다'},
+    {type:'설치', q:'농업·임업 부산물이 풍부한 농촌 지역이나 음식물 폐기물이 많은 도시 근교에 적합하다'},
+  ]},
+  { id:'tidal', icon:'🌊', name:'해양(조력)', facts:[
+    {type:'원리', q:'밀물과 썰물로 해수면이 오르내리는 수위 차를 이용해 수문을 열고 닫으며 터빈을 돌린다'},
+    {type:'원리', q:'조수 간만의 차로 생기는 해수의 위치 에너지를 전기 에너지로 변환하는 방식이다'},
+    {type:'특징', q:'댐과 유사한 방조제 구조물을 바다에 설치해 해수를 가두고 수위 차로 발전한다'},
+    {type:'장점', q:'조석 주기가 일정해 언제 얼마나 발전할 수 있는지 수십 년 앞까지 예측할 수 있다'},
+    {type:'장점', q:'한번 건설하면 수십 년간 안정적으로 운영할 수 있어 장기 경제성이 높다'},
+    {type:'단점', q:'방조제 건설로 해양 생태계와 갯벌이 파괴될 수 있다'},
+    {type:'단점', q:'초기 건설 비용이 매우 높고 공사 기간도 오래 걸린다'},
+    {type:'설치', q:'조수 간만의 차가 최소 5m 이상인 특수한 해안에만 설치할 수 있어 입지가 매우 제한적이다'},
+    {type:'비교', q:'조력은 수위 차를 이용하고, 조류는 해수의 흐름(유동)을 이용한다는 점에서 원리가 다르다'},
+  ]},
+  { id:'wave', icon:'🏄', name:'해양(파력)', facts:[
+    {type:'원리', q:'파도의 상하 운동으로 공기를 압축·팽창시켜 터빈을 돌리거나 기계적 운동을 전기로 변환한다'},
+    {type:'원리', q:'연안 또는 심해에서 파랑(파도)이 가진 운동 에너지를 전기 에너지로 바꾼다'},
+    {type:'특징', q:'아직 기술 개발 초기 단계로 대규모 상용화보다는 실증 연구 단계에 머물러 있다'},
+    {type:'특징', q:'고정식(해안 설치)과 부유식(해상 설치) 두 가지 방식으로 개발되고 있다'},
+    {type:'장점', q:'해안선이 긴 나라에서 자원이 풍부하고 별도의 토지 점유 없이 바다를 활용한다'},
+    {type:'단점', q:'파고가 날씨와 계절에 따라 크게 달라져 발전량이 불안정하고 예측하기 어렵다'},
+    {type:'단점', q:'해수·염분에 의한 장비 부식과 폭풍 등 극한 환경에서의 내구성 확보가 어렵다'},
+    {type:'설치', q:'파도가 강하고 일정하게 치는 해안선이 긴 지역, 특히 대서양 연안 국가에 적합하다'},
+  ]},
+  { id:'current', icon:'🔄', name:'해양(조류)', facts:[
+    {type:'원리', q:'바닷속에서 흐르는 해수의 유동 에너지로 수중에 설치된 터빈을 돌려 전기를 생산한다'},
+    {type:'원리', q:'수중 터빈이 일정 방향으로 흐르는 해류를 받아 회전하며 발전하는 방식이다'},
+    {type:'특징', q:'터빈이 수면 아래에 설치되어 외관상 보이지 않아 경관 훼손이 없다'},
+    {type:'특징', q:'물의 밀도가 공기보다 800배 높아 소형 터빈으로도 큰 출력이 가능하다'},
+    {type:'장점', q:'일정한 속도로 흐르는 해류를 이용해 발전량을 안정적으로 유지하고 예측할 수 있다'},
+    {type:'단점', q:'설비가 바닷속에 잠겨 있어 해수 부식이 심하고 유지·보수 작업이 매우 어렵다'},
+    {type:'단점', q:'조류가 빠른 특정 해협이나 수로에만 설치할 수 있어 입지 조건이 까다롭다'},
+    {type:'설치', q:'해류가 빠르고 일정하게 흐르는 해협이나 좁은 수로 근처에 설치하면 효율이 높다'},
+    {type:'비교', q:'조력이 수위 차(위치에너지)를 이용하는 것과 달리, 조류는 해수의 흐름(운동에너지)을 이용한다'},
+  ]},
+  { id:'otec', icon:'🌡️', name:'해양(해수온도차)', facts:[
+    {type:'원리', q:'표층 해수(25~30℃)와 수심 500~1000m의 심층 해수(5~7℃) 온도 차로 열에너지를 전기로 변환한다'},
+    {type:'원리', q:'온도 차로 작동 유체를 기화시켜 터빈을 돌리고, 심층 냉수로 다시 액화시키는 사이클을 반복한다'},
+    {type:'특징', q:'발전 외에도 심층 냉수를 냉방, 담수화, 양식업에도 활용할 수 있다'},
+    {type:'장점', q:'태양광·풍력과 달리 날씨나 계절에 관계없이 24시간 연속 발전이 가능하다'},
+    {type:'단점', q:'온도 차가 20℃ 내외로 작아 발전 효율이 낮고 대규모 해수 펌핑에 에너지가 많이 소요된다'},
+    {type:'단점', q:'심층 해수를 끌어올리기 위한 긴 파이프 설치와 유지 비용이 매우 높다'},
+    {type:'설치', q:'표층과 심층의 온도 차가 충분한 적도 근처 열대 해역에서만 효과적으로 활용할 수 있다'},
+    {type:'비교', q:'해수온도차 발전은 해양의 열에너지를, 조력과 조류는 역학적 에너지를 이용한다는 점에서 다르다'},
+  ]},
+  { id:'hydrogen', icon:'⚗️', name:'신에너지(수소)', facts:[
+    {type:'원리', q:'물을 전기 분해해 수소를 얻고, 수소를 연소시킬 때 발생하는 열과 폭발력을 에너지로 활용한다'},
+    {type:'원리', q:'태양광·풍력으로 생산한 전기로 물을 분해해 만든 그린수소가 가장 친환경적이다'},
+    {type:'특징', q:'기체 또는 액체 형태로 압축·냉각해 저장하고 파이프라인이나 탱크로 수송할 수 있다'},
+    {type:'특징', q:'우주에서 가장 풍부한 원소이지만 지구에서는 물·화석연료 속에 결합된 상태로 존재한다'},
+    {type:'장점', q:'연소 시 물만 배출해 완전 무공해이며 에너지 밀도가 매우 높다'},
+    {type:'장점', q:'전기로 저장하기 어려운 잉여 재생에너지를 수소로 변환해 장기 저장할 수 있다'},
+    {type:'단점', q:'수소를 안전하게 생산·저장·운반하는 기술과 인프라 구축이 아직 해결해야 할 과제이다'},
+    {type:'단점', q:'현재 대부분의 수소는 천연가스를 개질해 만들어 생산 과정에서 탄소가 발생한다'},
+    {type:'비교', q:'수소는 에너지를 저장·운반하는 에너지 캐리어 역할을 하며, 연료전지는 수소를 전기로 변환하는 장치이다'},
+  ]},
+  { id:'fuelcell', icon:'🔋', name:'신에너지(연료전지)', facts:[
+    {type:'원리', q:'수소와 산소를 전기화학적으로 반응시켜 전기와 열을 동시에 생산하는 발전 장치이다'},
+    {type:'원리', q:'연소 없이 화학 에너지를 직접 전기로 바꾸므로 카르노 효율의 제한을 받지 않는다'},
+    {type:'특징', q:'가정용 소형 발전기부터 수소차까지 다양한 크기로 분산 설치해 활용할 수 있다'},
+    {type:'특징', q:'전해질 종류에 따라 고분자전해질형(PEMFC), 고체산화물형(SOFC) 등 여러 종류가 있다'},
+    {type:'장점', q:'연소 방식 없이 화학 반응으로 발전해 효율이 40~60%로 일반 화력 발전보다 훨씬 높다'},
+    {type:'장점', q:'소음과 진동이 거의 없어 도심 건물이나 병원 등 민감한 장소에도 설치할 수 있다'},
+    {type:'단점', q:'초기 설치 비용이 높고 수소 공급 인프라가 아직 부족하다'},
+    {type:'단점', q:'촉매로 사용하는 백금이 고가여서 생산 비용을 낮추는 것이 기술적 과제이다'},
+    {type:'비교', q:'연료전지는 배터리와 달리 외부에서 수소를 계속 공급받아 지속적으로 전기를 생산한다'},
+  ]},
+  { id:'coal_gas', icon:'🏭', name:'신에너지(석탄액화·가스화)', facts:[
+    {type:'원리', q:'석탄에 산소와 물을 넣고 800~1500℃로 가열해 탄화수소(석유·가스) 형태의 연료로 변환한다'},
+    {type:'원리', q:'석탄을 고온·고압에서 부분 산화시켜 일산화탄소와 수소가 주성분인 합성가스(syngas)를 만든다'},
+    {type:'특징', q:'석탄액화는 고체 석탄을 액체 연료로, 가스화는 기체 연료로 변환하는 두 가지 방식이 있다'},
+    {type:'특징', q:'IGCC(석탄가스화복합발전)는 합성가스를 가스터빈과 증기터빈에 이중으로 활용해 효율을 높인다'},
+    {type:'장점', q:'기존 석탄 화력 발전소 인프라를 활용할 수 있고 석탄 화력보다 발전 효율이 높다'},
+    {type:'장점', q:'매장량이 풍부하고 가격이 저렴한 석탄을 청정하게 활용할 수 있는 과도기적 기술이다'},
+    {type:'비교', q:'석탄가스화는 석탄을 그대로 태우는 기존 화력 발전보다 효율이 높고 오염물질 배출이 적다'},
+  ]},
+];
+
+const RANKS = [
+  { min:95, emoji:'🏆', title:'에너지 마스터', color:'#FFE66D', bg:'#3D3000' },
+  { min:80, emoji:'🥇', title:'에너지 박사',   color:'#FFD700', bg:'#3A2E00' },
+  { min:65, emoji:'🥈', title:'에너지 연구원', color:'#C0C0C0', bg:'#2A2A2A' },
+  { min:50, emoji:'🥉', title:'에너지 탐험가', color:'#CD7F32', bg:'#2D1A00' },
+  { min:0,  emoji:'🌱', title:'에너지 새싹',   color:'#4ECDC4', bg:'#0D2A28' },
+];
+
+const COMBO_MSG = {
+  2: ['2연속! 🔥', '#FFE66D', '#3D3000'],
+  3: ['3연속 콤보!! 🔥🔥', '#FF9F43', '#3D2000'],
+  4: ['4연속 대박!!! 🔥🔥🔥', '#FF6B6B', '#3D0000'],
+  5: ['5연속 전설!!!! ⚡⚡⚡', '#E879F9', '#2D003D'],
+};
+
+const TAG_CLASS = { '원리':'tag-원리','특징':'tag-특징','장점':'tag-장점','단점':'tag-단점','설치':'tag-설치','비교':'tag-비교' };
+
+// 같은 보기에 함께 나오면 안 되는 에너지 쌍 (의미 겹침 / 문장 내 이름 언급)
+const CONFLICT = {
+  'solar_pv':   ['solar_th'],           // 태양광↔태양열 (비교문제, 의미겹침)
+  'solar_th':   ['solar_pv'],
+  'geo':        ['otec'],               // 지열↔해수온도차 (24시간 장점 겹침)
+  'otec':       ['geo', 'tidal', 'current'], // 해수온도차 비교문장에 조력·조류 언급
+  'tidal':      ['current', 'otec'],    // 조력↔조류 (비교문장 상호 언급)
+  'current':    ['tidal', 'otec'],
+  'hydrogen':   ['fuelcell'],           // 수소↔연료전지 (단점 겹침, 비교문장)
+  'fuelcell':   ['hydrogen'],
+  'bio':        ['coal_gas'],           // 바이오↔석탄가스화 (기존 인프라 장점 겹침)
+  'coal_gas':   ['bio'],
+  'hydro':      ['tidal'],              // 수력↔조력 (장기운영 장점 겹침)
+};
+
+function shu(a){ const b=[...a]; for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];} return b; }
+
+function buildPool(){
+  const p=[];
+  E.forEach(e=>e.facts.forEach(f=>{
+    // 비교 문제는 n2d(에너지→설명) 모드에서만 출제 (d2n이면 문장 속 다른 에너지 이름 보고 찍음)
+    if(f.type !== '비교') p.push({mode:'d2n', energy:e, fact:f});
+    p.push({mode:'n2d', energy:e, fact:f});
+  }));
+  return p;
+}
+
+function getConflicts(eid){ return CONFLICT[eid] || []; }
+function showScreen(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+function goHome(){ showScreen('screen-start'); }
+
+let qs,idx,cc,wc,score,combo,maxCombo,locked,log,timerInterval,timeLeft;
+
+const TOTAL_TIME = 10;
+const CIRC = 2 * Math.PI * 18; // 113.1
+
+function startTimer() {
+  clearInterval(timerInterval);
+  timeLeft = TOTAL_TIME;
+  updateTimerUI(timeLeft);
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    updateTimerUI(timeLeft);
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      timeoutQ();
+    }
+  }, 1000);
+}
+
+function stopTimer() { clearInterval(timerInterval); }
+
+function updateTimerUI(t) {
+  const arc = document.getElementById('timer-arc');
+  const num = document.getElementById('timer-num');
+  const bar = document.getElementById('timer-bar');
+  const ratio = t / TOTAL_TIME;
+  arc.style.strokeDashoffset = CIRC * (1 - ratio);
+  num.textContent = t;
+  bar.style.width = (ratio * 100) + '%';
+  // 위험 색상 (3초 이하)
+  const danger = t <= 3;
+  arc.style.stroke = danger ? '#FF6B6B' : (t <= 6 ? '#FF9F43' : 'var(--accent)');
+  num.style.color  = danger ? '#FF6B6B' : (t <= 6 ? '#FF9F43' : 'var(--accent)');
+  bar.style.background = danger ? '#FF6B6B' : (t <= 6 ? '#FF9F43' : 'var(--accent)');
+}
+
+function timeoutQ() {
+  if (locked) return;
+  locked = true;
+  const q = qs[idx], e = q.energy;
+  document.querySelectorAll('.opt').forEach(b => b.disabled = true);
+  // 정답 하이라이트
+  const all = [...document.querySelectorAll('.opt')];
+  if (q.mode === 'd2n') { const cb = all.find(b => b.textContent.includes(e.name)); if(cb) cb.classList.add('reveal'); }
+  else { const cb = all.find(b => b.textContent === q.fact.q); if(cb) cb.classList.add('reveal'); }
+  const fb = document.getElementById('fb');
+  fb.textContent = '⏰ 시간 초과!';
+  fb.className = 'feedback show ng';
+  combo = 0;
+  document.getElementById('combo-text').style.display = 'none';
+  log.push({ok: false, energy: e, fact: q.fact, timeout: true});
+  cc = log.filter(l=>l.ok).length; wc = log.filter(l=>!l.ok).length;
+  const nb = document.getElementById('nb');
+  nb.className = 'next-btn show';
+  nb.textContent = idx === 19 ? '결과 보기 🎯' : '다음 문제 →';
+}
+
+function startQuiz(){
+  qs=shu(buildPool()).slice(0,20);
+  idx=0; cc=0; wc=0; score=0; combo=0; maxCombo=0; locked=false; log=[];
+  document.getElementById('score').textContent='0';
+  document.getElementById('combo-text').style.display='none';
+  showScreen('screen-quiz');
+  render();
+}
+
+function render(){
+  locked=false;
+  const q=qs[idx], e=q.energy;
+  document.getElementById('qn').textContent=idx+1;
+  document.getElementById('pf').style.width=Math.round(idx/20*100)+'%';
+  document.getElementById('fb').className='feedback';
+  document.getElementById('nb').className='next-btn';
+  startTimer();
+
+  const tag=document.getElementById('qtag');
+  tag.textContent=q.fact.type;
+  tag.className='q-type-tag '+(TAG_CLASS[q.fact.type]||'');
+
+  const og=document.getElementById('og');
+
+  if(q.mode==='d2n'){
+    document.getElementById('ql').textContent='설명을 읽고 해당 에너지를 고르세요';
+    document.getElementById('qt').textContent=q.fact.q;
+    og.className='opts two-col';
+    // d2n: 충돌 에너지는 보기에서 제외
+    const conflicts = getConflicts(e.id);
+    const wrongEnergies = shu(E.filter(d=> d.id!==e.id && !conflicts.includes(d.id))).slice(0,3);
+    const opts=shu([e,...wrongEnergies]);
+    og.innerHTML='';
+    opts.forEach(o=>{
+      const b=document.createElement('button');
+      b.className='opt'; b.textContent=o.icon+' '+o.name;
+      b.onclick=()=>check(b,o.id===e.id,e,q,'name');
+      og.appendChild(b);
+    });
+  } else {
+    document.getElementById('ql').textContent='에너지를 보고 올바른 설명을 고르세요';
+    document.getElementById('qt').textContent=e.icon+'  '+e.name;
+    og.className='opts';
+    // n2d: 충돌 에너지의 설명은 오답 보기에서 제외
+    const conflicts2 = getConflicts(e.id);
+    let cands=[];
+    E.filter(d=> d.id!==e.id && !conflicts2.includes(d.id))
+      .forEach(d=>d.facts.filter(f=>f.type===q.fact.type).forEach(f=>cands.push({...f,_eid:d.id})));
+    if(cands.length<3){
+      E.filter(d=> d.id!==e.id && !conflicts2.includes(d.id))
+        .forEach(d=>d.facts.forEach(f=>cands.push({...f,_eid:d.id})));
+    }
+    cands=shu(cands);
+    const wf=[]; const seen=new Set();
+    for(const c of cands){ if(wf.length>=3)break; if(!seen.has(c._eid)){seen.add(c._eid);wf.push(c);} }
+    const opts=shu([q.fact,...wf]);
+    og.innerHTML='';
+    opts.forEach(o=>{
+      const b=document.createElement('button'); b.className='opt'; b.textContent=o.q;
+      b.onclick=()=>check(b,o.q===q.fact.q,e,q,'desc');
+      og.appendChild(b);
+    });
+  }
+}
+
+function check(btn,isOk,e,q,type){
+  if(locked)return; locked=true;
+  stopTimer();
+  document.querySelectorAll('.opt').forEach(b=>b.disabled=true);
+  const fb=document.getElementById('fb');
+
+  if(isOk){
+    btn.classList.add('ok');
+    combo++; if(combo>maxCombo)maxCombo=combo;
+    const pts=100+(combo>1?combo*20:0);
+    score+=pts;
+    document.getElementById('score').textContent=score;
+    fb.textContent='✅ 정답! +'+pts+'점';
+    fb.className='feedback show ok';
+    spawnParticles(btn);
+    showCombo(combo);
+  } else {
+    btn.classList.add('ng'); combo=0;
+    const all=[...document.querySelectorAll('.opt')];
+    if(type==='name'){ const cb=all.find(b=>b.textContent.includes(e.name)); if(cb)cb.classList.add('reveal'); }
+    else { const cb=all.find(b=>b!==btn&&b.textContent===q.fact.q); if(cb)cb.classList.add('reveal'); }
+    fb.textContent='❌ 오답!';
+    fb.className='feedback show ng';
+    document.getElementById('combo-text').style.display='none';
+  }
+
+  log.push({ok:isOk,energy:e,fact:q.fact});
+  cc=log.filter(l=>l.ok).length; wc=log.filter(l=>!l.ok).length;
+
+  const nb=document.getElementById('nb');
+  nb.className='next-btn show';
+  nb.textContent=idx===19?'결과 보기 🎯':'다음 문제 →';
+}
+
+function showCombo(c){
+  const el=document.getElementById('combo-text');
+  if(c<2){ el.style.display='none'; return; }
+  const key=Math.min(c,5);
+  const [msg,color,bg]=COMBO_MSG[key]||COMBO_MSG[5];
+  el.textContent=msg;
+  el.style.display='inline-block';
+  el.style.color=color;
+  el.style.background=bg;
+  el.style.border=`1px solid ${color}50`;
+  // 재애니메이션
+  el.style.animation='none';
+  el.offsetHeight;
+  el.style.animation='comboPop .4s cubic-bezier(.34,1.56,.64,1)';
+}
+
+function spawnParticles(btn){
+  const rect=btn.getBoundingClientRect();
+  const cx=rect.left+rect.width/2, cy=rect.top+rect.height/2;
+  const colors=['#4ECDC4','#FFE66D','#FF6B6B','#A78BFA','#34D399'];
+  const pc=document.getElementById('particles');
+  for(let i=0;i<18;i++){
+    const p=document.createElement('div'); p.className='particle';
+    const size=4+Math.random()*8;
+    const angle=Math.random()*360, dist=60+Math.random()*120;
+    const tx=Math.cos(angle*Math.PI/180)*dist, ty=Math.sin(angle*Math.PI/180)*dist;
+    const dur=.5+Math.random()*.5;
+    p.style.cssText=`width:${size}px;height:${size}px;left:${cx}px;top:${cy}px;background:${colors[Math.floor(Math.random()*colors.length)]};--tx:${tx}px;--ty:${ty}px;--dur:${dur}s`;
+    pc.appendChild(p);
+    setTimeout(()=>p.remove(), dur*1000+100);
+  }
+}
+
+function nextQ(){ stopTimer(); idx++; if(idx>=20)showResult(); else render(); }
+
+function showResult(){
+  stopTimer();
+  const pct=Math.round(cc/20*100);
+  const rank=RANKS.find(r=>pct>=r.min);
+  document.getElementById('re').textContent=rank.emoji;
+  const rb=document.getElementById('rank-badge');
+  rb.textContent=rank.title;
+  rb.style.background=rank.bg; rb.style.color=rank.color;
+  rb.style.border=`1px solid ${rank.color}50`;
+  document.getElementById('result-title').textContent=`20문제 중 ${cc}개 정답 · 정확도 ${pct}%`;
+  document.getElementById('res-c').textContent=cc;
+  document.getElementById('res-w').textContent=wc;
+  document.getElementById('res-p').textContent=pct+'%';
+  document.getElementById('max-combo').textContent=maxCombo+'연속';
+  document.getElementById('pf').style.width='100%';
+
+  const ll=document.getElementById('log-list'); ll.innerHTML='';
+  log.forEach(l=>{
+    const d=document.createElement('div'); d.className='log-item '+(l.ok?'ok':'ng');
+    d.innerHTML=`<div class="log-icon">${l.ok?'✅':(l.timeout?'⏰':'❌')}</div>
+      <div><span class="log-energy">${l.energy.icon} ${l.energy.name} · ${l.fact.type}</span>
+      <span class="log-q">${l.timeout?'[시간초과] ':''} ${l.fact.q}</span></div>`;
+    ll.appendChild(d);
+  });
+  showScreen('screen-result');
+}
+</script>
+</body>
+</html>
