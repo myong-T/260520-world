@@ -447,10 +447,11 @@ function setupMap(){
   // 초기 세팅
   const initLayout = ()=>{
     const ww=wrap.clientWidth, wh=wrap.clientHeight;
-    const sw=900, sh=500;
-    scale = Math.min(ww/sw, wh/sh) * 1.1;
+    const sw=1000, sh=500;
+    const headerH = 50;
+    scale = Math.min(ww/sw, (wh-headerH)/sh);
     tx = (ww - sw*scale)/2;
-    ty = (wh - sh*scale)/2;
+    ty = ((wh-headerH) - sh*scale)/2 + headerH;
     svgWrap.style.width=sw+'px';
     svgWrap.style.height=sh+'px';
     setTransform();
