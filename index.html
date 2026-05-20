@@ -7,32 +7,19 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Black+Han+Sans&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #0a1628;
-  --ocean: #0d2137;
-  --surface: #1a2d45;
-  --surface2: #223a57;
-  --border: #2e4d70;
-  --text: #e8f4ff;
-  --text-sub: #7aa3c8;
-  --text-muted: #3d6080;
-  --accent: #4ecdc4;
-  --accent2: #ffe66d;
-  --green: #2ecc71;
-  --green-dim: #0d2e1a;
-  --red: #e74c3c;
-  --red-dim: #2e0d0d;
-  --gold: #f39c12;
+  --bg:#0a1628; --surface:#1a2d45; --surface2:#223a57; --border:#2e4d70;
+  --text:#e8f4ff; --text-sub:#7aa3c8; --text-muted:#3d6080;
+  --accent:#4ecdc4; --accent2:#ffe66d; --green:#2ecc71; --green-dim:#0d2e1a;
+  --red:#e74c3c; --red-dim:#2e0d0d;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;overflow:hidden}
+html,body{width:100%;height:100%;overflow:hidden}
 body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text)}
 
-/* ── STARS ── */
 .stars{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
 .star{position:absolute;border-radius:50%;background:#fff;animation:twinkle var(--d) var(--delay) infinite}
 @keyframes twinkle{0%,100%{opacity:0}50%{opacity:var(--op)}}
 
-/* ── SCREENS ── */
 .screen{display:none;position:fixed;inset:0;z-index:10;animation:fadeIn .35s ease}
 .screen.active{display:flex;align-items:center;justify-content:center}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
@@ -50,35 +37,48 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 .s-btn{width:100%;padding:15px;font-size:17px;font-weight:900;font-family:'Black Han Sans',sans-serif;letter-spacing:.05em;background:linear-gradient(135deg,#4ecdc4,#44a08d);color:#0a1628;border:none;border-radius:14px;cursor:pointer;box-shadow:0 4px 24px rgba(78,205,196,.4);transition:transform .15s}
 .s-btn:hover{transform:translateY(-2px)}
 
-/* ── MAP SCREEN ── */
-#screen-map{flex-direction:column;overflow:hidden}
-.map-header{position:fixed;top:0;left:0;right:0;z-index:20;padding:10px 16px;background:linear-gradient(180deg,var(--bg) 80%,transparent);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
-.map-title{font-family:'Black Han Sans',sans-serif;font-size:16px;color:var(--accent);letter-spacing:.03em}
-.map-chips{display:flex;gap:6px;align-items:center}
+/* ── MAP ── */
+#screen-map{flex-direction:column;padding:0}
+.map-header{
+  position:fixed;top:0;left:0;right:0;z-index:20;
+  padding:10px 16px;height:48px;
+  background:linear-gradient(180deg,rgba(10,22,40,.95) 80%,transparent);
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+}
+.map-title{font-family:'Black Han Sans',sans-serif;font-size:16px;color:var(--accent)}
+.map-chips{display:flex;gap:6px}
 .chip{font-size:12px;padding:4px 12px;background:var(--surface);border:1px solid var(--border);border-radius:20px;color:var(--text-sub)}
 .chip b{color:var(--accent2)}
-.home-btn{font-size:12px;padding:5px 12px;background:transparent;border:1px solid var(--border);border-radius:20px;color:var(--text-sub);cursor:pointer}
-.home-btn:hover{background:var(--surface)}
 
-.map-wrap{width:100%;height:100%;overflow:hidden;position:relative;cursor:grab}
-.map-wrap:active{cursor:grabbing}
-.map-svg-wrap{position:absolute;transform-origin:center center}
+/* SVG 지도를 헤더 아래 전체 화면에 꽉 채움 */
+.map-container{
+  position:fixed;
+  top:48px; left:0; right:0; bottom:0;
+  overflow:hidden;
+  cursor:grab;
+}
+.map-container:active{cursor:grabbing}
+.map-svg-wrap{
+  position:absolute;
+  top:0;left:0;
+  width:100%;height:100%;
+}
+#world-map{
+  width:100%;
+  height:100%;
+  display:block;
+}
 
-/* 나라 스타일 */
 .country{fill:#1a3d5c;stroke:#0a1628;stroke-width:.5;cursor:pointer;transition:fill .2s}
 .country:hover{fill:#2a5a80}
 .country.conquered{fill:#1a4d3a}
 .country.failed{fill:#3d1a1a}
-.country.active-q{fill:#2a4a6a;stroke:var(--accent);stroke-width:1.5}
+.country.giveup{fill:#2a1a2a}
+.country.active-q{stroke:var(--accent);stroke-width:1.5}
+.map-pin{pointer-events:none;text-anchor:middle;dominant-baseline:middle;animation:pinPop .4s cubic-bezier(.34,1.56,.64,1)}
+@keyframes pinPop{from{transform:scale(0)}to{transform:scale(1)}}
+.country-label{pointer-events:none;fill:#4a7a9b;text-anchor:middle;dominant-baseline:middle;font-family:'Noto Sans KR',sans-serif}
 
-/* 핀 */
-.map-pin{pointer-events:none;font-size:18px;text-anchor:middle;dominant-baseline:middle;animation:pinPop .4s cubic-bezier(.34,1.56,.64,1)}
-@keyframes pinPop{from{transform:scale(0) translateY(-10px)}to{transform:scale(1) translateY(0)}}
-
-/* 나라 라벨 */
-.country-label{pointer-events:none;font-size:9px;fill:#4a7a9b;text-anchor:middle;dominant-baseline:middle;font-family:'Noto Sans KR',sans-serif}
-
-/* 툴팁 */
 .map-tooltip{position:fixed;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:8px 12px;font-size:12px;color:var(--text);pointer-events:none;display:none;z-index:30;white-space:nowrap}
 .map-tooltip .tt-name{font-weight:700;color:var(--accent);margin-bottom:2px}
 .map-tooltip .tt-energy{color:var(--text-sub)}
@@ -90,7 +90,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 @keyframes modalPop{from{transform:scale(.92);opacity:0}to{transform:scale(1);opacity:1}}
 .modal-head{padding:16px 20px 14px;border-bottom:1px solid var(--border);position:relative}
 .modal-head::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#4ecdc4,#ffe66d)}
-.modal-region{font-size:12px;color:var(--text-muted);letter-spacing:.04em;margin-bottom:4px}
+.modal-region{font-size:12px;color:var(--text-muted);margin-bottom:4px}
 .modal-energy{font-family:'Black Han Sans',sans-serif;font-size:18px;color:var(--text)}
 .modal-prog{display:flex;gap:6px;margin-top:10px}
 .prog-dot{width:28px;height:6px;border-radius:3px;background:var(--surface2);border:1px solid var(--border)}
@@ -117,9 +117,9 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 .modal-next.show{display:block}
 
 /* ── RESULT MODAL ── */
-.result-modal{background:var(--surface);border:1px solid var(--border);border-radius:20px;width:100%;max-width:400px;padding:28px 24px;text-align:center;animation:modalPop .35s cubic-bezier(.34,1.56,.64,1)}
-.result-modal::before{content:'';display:block;height:3px;background:linear-gradient(90deg,#4ecdc4,#ffe66d,#ff6b6b);border-radius:2px;margin-bottom:20px;margin-left:-24px;margin-right:-24px;margin-top:-28px}
-.rm-emoji{font-size:48px;margin-bottom:10px}
+.result-modal{background:var(--surface);border:1px solid var(--border);border-radius:20px;width:100%;max-width:400px;padding:28px 24px;text-align:center;animation:modalPop .35s cubic-bezier(.34,1.56,.64,1);position:relative;overflow:hidden}
+.result-modal::before{content:'';display:block;position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#4ecdc4,#ffe66d,#ff6b6b)}
+.rm-emoji{font-size:48px;margin:12px 0 10px}
 .rm-title{font-family:'Black Han Sans',sans-serif;font-size:18px;margin-bottom:6px}
 .rm-sub{font-size:13px;color:var(--text-sub);margin-bottom:18px}
 .rm-score{display:flex;justify-content:center;gap:16px;margin-bottom:20px}
@@ -128,8 +128,8 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 .rm-l{font-size:11px;color:var(--text-muted)}
 .rm-btn{width:100%;padding:12px;font-size:14px;font-weight:700;font-family:'Black Han Sans',sans-serif;border-radius:10px;border:none;cursor:pointer;transition:opacity .15s}
 .rm-btn:hover{opacity:.85}
-.rm-btn.continue{background:linear-gradient(135deg,#4ecdc4,#44a08d);color:#0a1628;margin-bottom:8px}
-.rm-btn.home{background:transparent;color:var(--text-sub);border:1px solid var(--border)}
+.rm-btn.continue{background:linear-gradient(135deg,#4ecdc4,#44a08d);color:#0a1628}
+.rm-btn.retry{margin-top:8px;background:var(--surface2);color:var(--accent2);border:1px solid #ffe66d40}
 
 /* ── FINAL ── */
 .final-box{text-align:center;padding:36px 28px;max-width:460px;width:90%;background:var(--surface);border:1px solid var(--border);border-radius:20px}
@@ -143,7 +143,6 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 .fs-lbl{font-size:11px;color:var(--text-muted)}
 .final-btn{width:100%;padding:13px;font-size:15px;font-weight:700;font-family:'Black Han Sans',sans-serif;background:linear-gradient(135deg,#4ecdc4,#44a08d);color:#0a1628;border:none;border-radius:12px;cursor:pointer}
 
-/* 태그 색상 */
 .tag-원리{background:#1a2a4a;color:#60a5fa}
 .tag-특징{background:#2a1a4a;color:#a78bfa}
 .tag-장점{background:#1a3a2a;color:#34d399}
@@ -151,14 +150,12 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 .tag-설치{background:#3a2a1a;color:#fbbf24}
 .tag-비교{background:#2a1a3a;color:#e879f9}
 
-/* 파티클 */
 .particle-container{position:fixed;inset:0;pointer-events:none;z-index:999}
 .particle{position:absolute;border-radius:50%;animation:particleFly var(--dur) ease-out forwards}
 @keyframes particleFly{0%{transform:translate(0,0) scale(1);opacity:1}100%{transform:translate(var(--tx),var(--ty)) scale(0);opacity:0}}
 </style>
 </head>
 <body>
-
 <div class="stars" id="stars"></div>
 <div class="particle-container" id="particles"></div>
 <div class="map-tooltip" id="tooltip">
@@ -167,7 +164,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
   <div class="tt-status" id="tt-status"></div>
 </div>
 
-<!-- ── START ── -->
+<!-- START -->
 <div class="screen active" id="screen-start">
   <div class="start-box">
     <span class="globe">🌍</span>
@@ -182,7 +179,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
   </div>
 </div>
 
-<!-- ── MAP ── -->
+<!-- MAP -->
 <div class="screen" id="screen-map">
   <div class="map-header">
     <div class="map-title">🌍 세계 에너지 탐험</div>
@@ -191,10 +188,9 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
       <div class="chip">정답 <b id="total-correct">0</b></div>
     </div>
   </div>
-  <div class="map-wrap" id="map-wrap">
+  <div class="map-container" id="map-container">
     <div class="map-svg-wrap" id="map-svg-wrap">
-      <!-- SVG 세계지도 -->
-      <svg id="world-map" viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg" style="display:block">
+      <svg id="world-map" viewBox="0 0 1000 500" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
         <rect width="1000" height="500" fill="#0d2137"/>
 
         <!-- 북아메리카 -->
@@ -231,8 +227,8 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
         <path class="country" id="r-japan" data-region="japan"
           d="M782,122 L804,117 L810,162 L788,167 Z"/>
 
-        <!-- 한국 서해 (한반도 위치) -->
-        <ellipse class="country" id="r-westkorea" cx="762" cy="152" rx="15" ry="12"
+        <!-- 한국 -->
+        <ellipse class="country" id="r-korea" cx="762" cy="152" rx="15" ry="12"
           data-region="korea" style="fill:#102840;stroke:#2a6080;stroke-width:1.2"/>
 
         <!-- 오세아니아 -->
@@ -241,37 +237,36 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
         <path class="country" id="r-newzealand" data-region="newzealand"
           d="M848,358 L872,352 L878,393 L854,400 Z"/>
 
-        <!-- 태평양 (해수온도차) -->
+        <!-- 태평양 -->
         <ellipse class="country" id="r-pacific" cx="910" cy="272" rx="45" ry="32"
           data-region="pacific" style="fill:#102840;stroke:#1a4060"/>
 
         <!-- 라벨 -->
-        <text class="country-label" x="175" y="85">캐나다</text>
-        <text class="country-label" x="176" y="155">미국</text>
-        <text class="country-label" x="255" y="308">브라질</text>
-        <text class="country-label" x="376" y="82">아이슬란드</text>
-        <text class="country-label" x="442" y="78">노르웨이</text>
-        <text class="country-label" x="442" y="112">덴마크</text>
-        <text class="country-label" x="448" y="138">독일</text>
-        <text class="country-label" x="452" y="225">사하라</text>
-        <text class="country-label" x="548" y="218">사우디</text>
-        <text class="country-label" x="632" y="78">러시아</text>
-        <text class="country-label" x="612" y="242">인도</text>
-        <text class="country-label" x="692" y="165">중국</text>
-        <text class="country-label" x="794" y="142">일본</text>
-        <text class="country-label" x="762" y="152" style="fill:#4a9ab8;font-size:8px">한국</text>
-        <text class="country-label" x="772" y="355">호주</text>
-        <text class="country-label" x="860" y="378">뉴질랜드</text>
-        <text class="country-label" x="910" y="272" style="fill:#2a6080">태평양</text>
+        <text class="country-label" font-size="10" x="175" y="85">캐나다</text>
+        <text class="country-label" font-size="10" x="176" y="155">미국</text>
+        <text class="country-label" font-size="10" x="255" y="308">브라질</text>
+        <text class="country-label" font-size="9"  x="376" y="82">아이슬란드</text>
+        <text class="country-label" font-size="9"  x="442" y="78">노르웨이</text>
+        <text class="country-label" font-size="8"  x="442" y="112">덴마크</text>
+        <text class="country-label" font-size="9"  x="448" y="138">독일</text>
+        <text class="country-label" font-size="9"  x="452" y="225">사하라</text>
+        <text class="country-label" font-size="9"  x="548" y="218">사우디</text>
+        <text class="country-label" font-size="10" x="632" y="78">러시아</text>
+        <text class="country-label" font-size="9"  x="612" y="242">인도</text>
+        <text class="country-label" font-size="10" x="692" y="165">중국</text>
+        <text class="country-label" font-size="9"  x="794" y="142">일본</text>
+        <text class="country-label" font-size="8"  x="762" y="152" style="fill:#4a9ab8">한국</text>
+        <text class="country-label" font-size="10" x="772" y="355">호주</text>
+        <text class="country-label" font-size="8"  x="860" y="378">뉴질랜드</text>
+        <text class="country-label" font-size="8"  x="910" y="272" style="fill:#2a6080">태평양</text>
 
-        <!-- 핀 레이어 -->
         <g id="pins"></g>
       </svg>
     </div>
   </div>
 </div>
 
-<!-- ── FINAL ── -->
+<!-- FINAL -->
 <div class="screen" id="screen-final">
   <div class="final-box">
     <span class="final-trophy">🏆</span>
@@ -287,7 +282,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 </div>
 
 <script>
-// ── 별 생성 ──
+// 별 생성
 (function(){
   const c=document.getElementById('stars');
   for(let i=0;i<80;i++){
@@ -298,33 +293,30 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
   }
 })();
 
-// ── 지역 데이터 ──
 const REGIONS = {
-  canada:     { name:'🇨🇦 캐나다',          energy:'수력',                    icon:'💧', pin:[175,85],  hint:'넓은 국토와 풍부한 강'},
-  usa:        { name:'🇺🇸 미국 (서부)',      energy:'태양광',                  icon:'☀️', pin:[176,155], hint:'넓은 사막과 햇빛 풍부'},
-  brazil:     { name:'🇧🇷 브라질',          energy:'바이오',                  icon:'🌿', pin:[255,308], hint:'아마존 바이오매스 자원'},
-  iceland:    { name:'🇮🇸 아이슬란드',      energy:'지열',                    icon:'🌋', pin:[376,82],  hint:'화산섬, 지각활동 활발'},
-  norway:     { name:'🇳🇴 노르웨이',        energy:'수력',                    icon:'💧', pin:[442,78],  hint:'피오르드 지형, 낙차 큰 강'},
-  denmark:    { name:'🇩🇰 덴마크',          energy:'풍력',                    icon:'💨', pin:[442,112], hint:'북해 바람이 강한 해안'},
-  germany:    { name:'🇩🇪 독일',            energy:'태양광',                  icon:'☀️', pin:[448,138], hint:'재생에너지 선도 국가'},
-  saudi:      { name:'🇸🇦 사우디아라비아',  energy:'태양열',                  icon:'🌞', pin:[548,218], hint:'광활한 사막, 강렬한 일조량'},
-  sahara:     { name:'🏜️ 사하라 사막',      energy:'태양열',                  icon:'🌞', pin:[452,225], hint:'세계 최대 사막, 최고 일조량'},
-  russia:     { name:'🇷🇺 러시아',          energy:'신에너지(석탄액화·가스화)', icon:'🏭', pin:[632,78],  hint:'풍부한 석탄·화석연료 자원'},
-  china:      { name:'🇨🇳 중국',            energy:'풍력',                    icon:'💨', pin:[692,165], hint:'세계 최대 풍력 발전 국가'},
-  japan:      { name:'🇯🇵 일본',            energy:'지열',                    icon:'🌋', pin:[794,142], hint:'화산 열도, 온천 풍부'},
-  korea:      { name:'🇰🇷 한국',             energy:'해양(조력)',               icon:'🌊', pin:[762,152], hint:'조수 간만의 차 큰 서해안'},
-  india:      { name:'🇮🇳 인도',            energy:'바이오',                  icon:'🌿', pin:[612,242], hint:'농업 부산물·유기물 풍부'},
-  newzealand: { name:'🇳🇿 뉴질랜드',        energy:'지열',                    icon:'🌋', pin:[860,378], hint:'화산 지대, 지열 발전 선진국'},
-  australia:  { name:'🇦🇺 호주',            energy:'태양광',                  icon:'☀️', pin:[772,355], hint:'넓은 사막, 강한 햇빛'},
-  pacific:    { name:'🌊 태평양 (적도)',     energy:'해양(해수온도차)',          icon:'🌡️', pin:[910,272], hint:'표층·심층 온도차 큰 열대 해역'},
+  canada:    {name:'🇨🇦 캐나다',         energy:'수력',                    icon:'💧', pin:[175,85],  hint:'넓은 국토와 풍부한 강'},
+  usa:       {name:'🇺🇸 미국 (서부)',     energy:'태양광',                  icon:'☀️', pin:[176,155], hint:'넓은 사막과 햇빛 풍부'},
+  brazil:    {name:'🇧🇷 브라질',         energy:'바이오',                  icon:'🌿', pin:[255,308], hint:'아마존 바이오매스 자원'},
+  iceland:   {name:'🇮🇸 아이슬란드',     energy:'지열',                    icon:'🌋', pin:[376,82],  hint:'화산섬, 지각활동 활발'},
+  norway:    {name:'🇳🇴 노르웨이',       energy:'수력',                    icon:'💧', pin:[442,78],  hint:'피오르드 지형, 낙차 큰 강'},
+  denmark:   {name:'🇩🇰 덴마크',         energy:'풍력',                    icon:'💨', pin:[442,112], hint:'북해 바람이 강한 해안'},
+  germany:   {name:'🇩🇪 독일',           energy:'태양광',                  icon:'☀️', pin:[448,138], hint:'재생에너지 선도 국가'},
+  saudi:     {name:'🇸🇦 사우디아라비아', energy:'태양열',                  icon:'🌞', pin:[548,218], hint:'광활한 사막, 강렬한 일조량'},
+  sahara:    {name:'🏜️ 사하라 사막',     energy:'태양열',                  icon:'🌞', pin:[452,225], hint:'세계 최대 사막, 최고 일조량'},
+  russia:    {name:'🇷🇺 러시아',         energy:'신에너지(석탄액화·가스화)', icon:'🏭', pin:[632,78],  hint:'풍부한 석탄·화석연료 자원'},
+  china:     {name:'🇨🇳 중국',           energy:'풍력',                    icon:'💨', pin:[692,165], hint:'세계 최대 풍력 발전 국가'},
+  japan:     {name:'🇯🇵 일본',           energy:'지열',                    icon:'🌋', pin:[794,142], hint:'화산 열도, 온천 풍부'},
+  korea:     {name:'🇰🇷 한국',           energy:'해양(조력)',               icon:'🌊', pin:[762,152], hint:'조수 간만의 차 큰 서해안'},
+  india:     {name:'🇮🇳 인도',           energy:'바이오',                  icon:'🌿', pin:[612,242], hint:'농업 부산물·유기물 풍부'},
+  australia: {name:'🇦🇺 호주',           energy:'태양광',                  icon:'☀️', pin:[772,355], hint:'넓은 사막, 강한 햇빛'},
+  newzealand:{name:'🇳🇿 뉴질랜드',       energy:'지열',                    icon:'🌋', pin:[860,378], hint:'화산 지대, 지열 발전 선진국'},
+  pacific:   {name:'🌊 태평양 (적도)',   energy:'해양(해수온도차)',          icon:'🌡️', pin:[910,272], hint:'표층·심층 온도차 큰 열대 해역'},
 };
 
-// 퀴즈에 쓸 지역 (14개)
-const REGION_KEYS = ['iceland','norway','denmark','saudi','sahara','brazil','canada','usa','russia','china','japan','korea','india','pacific','australia','newzealand','germany'];
+const REGION_KEYS = Object.keys(REGIONS);
 
-// ── 문제 풀 (에너지별) ──
 const QUESTIONS = {
-  '태양광': [
+  '태양광':[
     {type:'원리', q:'태양 전지판(반도체 소자)으로 빛을 전기로 직접 변환하며, 터빈이나 발전기가 필요 없다'},
     {type:'특징', q:'태양전지 모듈은 움직이는 부품이 없어 고장이 거의 없고 유지보수가 매우 적다'},
     {type:'장점', q:'한번 설치하면 20년 이상 연료비 없이 전기를 생산할 수 있다'},
@@ -332,7 +324,7 @@ const QUESTIONS = {
     {type:'설치', q:'일조량이 풍부하고 그늘이 없는 남향 경사면이나 옥상에 설치하면 효율이 높다'},
     {type:'특징', q:'실리콘 반도체를 주재료로 사용하며, 모듈을 직렬·병렬로 연결해 용량을 조절한다'},
   ],
-  '태양열': [
+  '태양열':[
     {type:'원리', q:'반사경으로 햇빛을 한곳에 모아 1000℃의 고온 열을 만들고 증기로 터빈을 돌린다'},
     {type:'특징', q:'집열판에 열을 저장해 온수 공급 및 냉·난방에 직접 활용할 수 있다'},
     {type:'장점', q:'화석연료 없이 냉난방과 급탕을 해결할 수 있어 건물 에너지 절감 효과가 크다'},
@@ -340,7 +332,7 @@ const QUESTIONS = {
     {type:'설치', q:'반사경 어레이를 넓게 펼쳐야 해서 일사량이 풍부한 사막 지역에 주로 설치된다'},
     {type:'비교', q:'태양광이 빛을 전기로 직접 변환하는 것과 달리, 태양열은 빛을 열로 먼저 변환한 뒤 활용한다'},
   ],
-  '지열': [
+  '지열':[
     {type:'원리', q:'지하를 시추해 지구 내부의 열로 생성된 온수와 증기를 직접 뽑아올려 발전에 사용한다'},
     {type:'특징', q:'지구 내부의 방사성 원소 붕괴열과 지구 형성 초기의 열이 에너지원이다'},
     {type:'장점', q:'햇빛이나 바람이 없어도 지구 내부 열이 지속적으로 공급되어 에너지 잠재력이 무한하다'},
@@ -348,7 +340,7 @@ const QUESTIONS = {
     {type:'설치', q:'아이슬란드, 뉴질랜드처럼 화산활동이 활발한 지역이나 지열 자원이 풍부한 곳에 적합하다'},
     {type:'특징', q:'발전 후 남은 온수를 지역 난방이나 온실 농업에도 활용할 수 있다'},
   ],
-  '풍력': [
+  '풍력':[
     {type:'원리', q:'바람의 운동 에너지로 블레이드(날개)를 회전시켜 발전기를 돌려 전기를 생산한다'},
     {type:'특징', q:'육상(온쇼어)과 해상(오프쇼어) 두 가지 방식으로 설치할 수 있다'},
     {type:'장점', q:'산·바다·농지 위 등 다양한 지형에 설치할 수 있어 국토를 효율적으로 이용할 수 있다'},
@@ -356,7 +348,7 @@ const QUESTIONS = {
     {type:'설치', q:'바람이 많은 섬이나 해안가, 산 능선에 주로 설치되며 풍속이 고른 곳이 유리하다'},
     {type:'단점', q:'터빈 회전 시 소음과 진동이 발생해 인근 주민 민원의 원인이 된다'},
   ],
-  '수력': [
+  '수력':[
     {type:'원리', q:'댐에 가둔 물의 위치 에너지를 낙하시켜 회전력으로 바꾼 뒤 발전기를 돌려 전기를 생산한다'},
     {type:'특징', q:'재생에너지 중 가장 오랜 역사를 가지며 전 세계적으로 가장 많이 보급된 방식이다'},
     {type:'장점', q:'전력 수요에 맞춰 발전량을 빠르게 조절할 수 있고 운전 비용이 매우 낮다'},
@@ -364,7 +356,7 @@ const QUESTIONS = {
     {type:'설치', q:'강의 낙차가 크고 유량이 풍부한 산악 지역이나 하천 협곡에 주로 건설된다'},
     {type:'단점', q:'댐 건설을 위해 넓은 지역이 수몰되어 주민 이주와 문화재 침수 문제가 발생한다'},
   ],
-  '바이오': [
+  '바이오':[
     {type:'원리', q:'식물·동물 등 유기성 생물체(바이오매스)를 발효·가스화해 바이오디젤, 메탄가스 등 연료로 만든다'},
     {type:'특징', q:'바이오매스에는 목재, 농업 부산물, 음식물 쓰레기, 축산 분뇨 등 다양한 원료가 포함된다'},
     {type:'장점', q:'물과 적정 온도 조건만 갖추면 지역에 관계없이 어느 곳에서나 생산할 수 있다'},
@@ -372,7 +364,7 @@ const QUESTIONS = {
     {type:'설치', q:'농업·임업 부산물이 풍부한 농촌 지역이나 음식물 폐기물이 많은 도시 근교에 적합하다'},
     {type:'특징', q:'바이오디젤, 바이오알코올, 바이오메탄가스, 바이오메탄올 등 다양한 연료 형태로 변환된다'},
   ],
-  '해양(조력)': [
+  '해양(조력)':[
     {type:'원리', q:'밀물과 썰물로 해수면이 오르내리는 수위 차를 이용해 수문을 열고 닫으며 터빈을 돌린다'},
     {type:'특징', q:'댐과 유사한 방조제 구조물을 바다에 설치해 해수를 가두고 수위 차로 발전한다'},
     {type:'장점', q:'조석 주기가 일정해 언제 얼마나 발전할 수 있는지 수십 년 앞까지 예측할 수 있다'},
@@ -380,7 +372,7 @@ const QUESTIONS = {
     {type:'설치', q:'조수 간만의 차가 최소 5m 이상인 특수한 해안에만 설치할 수 있어 입지가 매우 제한적이다'},
     {type:'비교', q:'조력은 수위 차(위치에너지)를 이용하고, 조류는 해수의 흐름(운동에너지)을 이용한다'},
   ],
-  '해양(해수온도차)': [
+  '해양(해수온도차)':[
     {type:'원리', q:'표층 해수(25~30℃)와 수심 500~1000m의 심층 해수(5~7℃) 온도 차로 열에너지를 전기로 변환한다'},
     {type:'특징', q:'발전 외에도 심층 냉수를 냉방, 담수화, 양식업에도 활용할 수 있다'},
     {type:'장점', q:'태양광·풍력과 달리 날씨나 계절에 관계없이 24시간 연속 발전이 가능하다'},
@@ -388,7 +380,7 @@ const QUESTIONS = {
     {type:'설치', q:'표층과 심층의 온도 차가 충분한 적도 근처 열대 해역에서만 효과적으로 활용할 수 있다'},
     {type:'원리', q:'온도 차로 작동 유체를 기화시켜 터빈을 돌리고, 심층 냉수로 다시 액화시키는 사이클을 반복한다'},
   ],
-  '신에너지(석탄액화·가스화)': [
+  '신에너지(석탄액화·가스화)':[
     {type:'원리', q:'석탄에 산소와 물을 넣고 800~1500℃로 가열해 탄화수소(석유·가스) 형태의 연료로 변환한다'},
     {type:'특징', q:'석탄액화는 고체 석탄을 액체 연료로, 가스화는 기체 연료로 변환하는 두 가지 방식이 있다'},
     {type:'장점', q:'기존 석탄 화력 발전소 인프라를 활용할 수 있고 석탄 화력보다 발전 효율이 높다'},
@@ -398,138 +390,97 @@ const QUESTIONS = {
   ],
 };
 
-// 오답 보기용 에너지 목록 (충돌 제거된 풀)
-const ALL_ENERGIES = ['태양광','태양열','지열','풍력','수력','바이오','폐기물','해양(조력)','해양(파력)','해양(조류)','해양(해수온도차)','신에너지(수소)','신에너지(연료전지)','신에너지(석탄액화·가스화)'];
-const ENERGY_ICONS = {'태양광':'☀️','태양열':'🌞','지열':'🌋','풍력':'💨','수력':'💧','바이오':'🌿','폐기물':'♻️','해양(조력)':'🌊','해양(파력)':'🏄','해양(조류)':'🔄','해양(해수온도차)':'🌡️','신에너지(수소)':'⚗️','신에너지(연료전지)':'🔋','신에너지(석탄액화·가스화)':'🏭'};
-const TAG_CLASS = {'원리':'tag-원리','특징':'tag-특징','장점':'tag-장점','단점':'tag-단점','설치':'tag-설치','비교':'tag-비교'};
+const ALL_ENERGIES=['태양광','태양열','지열','풍력','수력','바이오','폐기물','해양(조력)','해양(파력)','해양(조류)','해양(해수온도차)','신에너지(수소)','신에너지(연료전지)','신에너지(석탄액화·가스화)'];
+const ENERGY_ICONS={'태양광':'☀️','태양열':'🌞','지열':'🌋','풍력':'💨','수력':'💧','바이오':'🌿','폐기물':'♻️','해양(조력)':'🌊','해양(파력)':'🏄','해양(조류)':'🔄','해양(해수온도차)':'🌡️','신에너지(수소)':'⚗️','신에너지(연료전지)':'🔋','신에너지(석탄액화·가스화)':'🏭'};
+const TAG_CLASS={'원리':'tag-원리','특징':'tag-특징','장점':'tag-장점','단점':'tag-단점','설치':'tag-설치','비교':'tag-비교'};
 
-// 상태
-let conquered = {}, totalCorrect = 0, totalAnswered = 0;
-let activeRegion = null;
-let quizState = null;
+let conquered={}, totalCorrect=0, totalAnswered=0, activeRegion=null, quizState=null;
 
-function shu(a){ const b=[...a]; for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];} return b; }
-function showScreen(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
-function goHome(){ closeModal(); showScreen('screen-start'); }
+function shu(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+function goHome(){closeModal();showScreen('screen-start');}
 
 function startMap(){
   conquered={}; totalCorrect=0; totalAnswered=0; activeRegion=null;
   document.getElementById('conquered-cnt').textContent='0';
   document.getElementById('total-correct').textContent='0';
-  document.querySelectorAll('.country').forEach(el=>{
-    el.classList.remove('conquered','failed','active-q');
-    el.style.fill='';
-  });
+  document.querySelectorAll('.country').forEach(el=>el.classList.remove('conquered','failed','giveup','active-q'));
   document.getElementById('pins').innerHTML='';
   showScreen('screen-map');
-  // 화면 전환 후 실제 크기 기준으로 레이아웃 재계산
-  setTimeout(()=>{ setupMap(); }, 50);
+  setTimeout(setupMap, 50);
 }
 
 function setupMap(){
-  document.querySelectorAll('.country').forEach(el=>{
-    const rk = el.dataset.region;
-    if(!REGION_KEYS.includes(rk)) return;
-    el.addEventListener('click', ()=>onRegionClick(rk, el));
-    el.addEventListener('mouseenter', (e)=>showTooltip(e, rk));
-    el.addEventListener('mouseleave', hideTooltip);
-    el.addEventListener('mousemove', moveTooltip);
+  REGION_KEYS.forEach(rk=>{
+    const el=document.getElementById('r-'+rk);
+    if(!el) return;
+    el.addEventListener('click',()=>onRegionClick(rk,el));
+    el.addEventListener('mouseenter',e=>showTooltip(e,rk));
+    el.addEventListener('mouseleave',hideTooltip);
+    el.addEventListener('mousemove',moveTooltip);
   });
 
-  // 지도 드래그/줌
-  const wrap = document.getElementById('map-wrap');
-  const svgWrap = document.getElementById('map-svg-wrap');
+  // 드래그/줌
+  const wrap=document.getElementById('map-container');
+  const svgWrap=document.getElementById('map-svg-wrap');
   let isDragging=false, startX=0, startY=0, tx=0, ty=0, scale=1;
+  const setT=()=>{ svgWrap.style.transformOrigin='0 0'; svgWrap.style.transform=`translate(${tx}px,${ty}px) scale(${scale})`; };
 
-  // 초기 위치 (가운데)
-  const setTransform = ()=>{ svgWrap.style.transform=`translate(${tx}px,${ty}px) scale(${scale})`; };
-
-  // 초기 세팅
-  const initLayout = ()=>{
-    const ww=wrap.clientWidth, wh=wrap.clientHeight;
-    const sw=1000, sh=500;
-    const headerH = 50;
-    scale = Math.min(ww/sw, (wh-headerH)/sh);
-    tx = (ww - sw*scale)/2;
-    ty = ((wh-headerH) - sh*scale)/2 + headerH;
-    svgWrap.style.width=sw+'px';
-    svgWrap.style.height=sh+'px';
-    setTransform();
-  };
-  initLayout();
-  window.addEventListener('resize', initLayout);
-
-  wrap.addEventListener('mousedown', e=>{isDragging=true; startX=e.clientX-tx; startY=e.clientY-ty;});
-  window.addEventListener('mouseup', ()=>isDragging=false);
-  window.addEventListener('mousemove', e=>{ if(!isDragging)return; tx=e.clientX-startX; ty=e.clientY-startY; setTransform(); });
-  wrap.addEventListener('wheel', e=>{
+  wrap.addEventListener('mousedown',e=>{isDragging=true;startX=e.clientX-tx;startY=e.clientY-ty;});
+  window.addEventListener('mouseup',()=>isDragging=false);
+  window.addEventListener('mousemove',e=>{if(!isDragging)return;tx=e.clientX-startX;ty=e.clientY-startY;setT();});
+  wrap.addEventListener('wheel',e=>{
     e.preventDefault();
+    const rect=wrap.getBoundingClientRect();
+    const mx=e.clientX-rect.left, my=e.clientY-rect.top;
     const delta=e.deltaY>0?-.1:.1;
-    scale=Math.max(.5,Math.min(3,scale+delta));
-    setTransform();
+    const newScale=Math.max(.5,Math.min(4,scale+delta));
+    tx=mx-(mx-tx)*(newScale/scale);
+    ty=my-(my-ty)*(newScale/scale);
+    scale=newScale;
+    setT();
   },{passive:false});
 }
 
-function showTooltip(e, rk){
-  const r = REGIONS[rk];
-  if(!r) return;
-  const tt = document.getElementById('tooltip');
-  document.getElementById('tt-name').textContent = r.name;
-  // 정복한 지역만 에너지 공개
-  if(conquered[rk]==='ok'){
-    document.getElementById('tt-energy').textContent = r.icon+' '+r.energy;
-  } else {
-    document.getElementById('tt-energy').textContent = '❓ 어떤 에너지일까?';
-  }
-  const st = conquered[rk]==='ok' ? '✅ 정복 완료!'
-    : conquered[rk]==='giveup' ? '💀 정복 불가 (3회 도전 실패)'
-    : conquered[rk]==='fail' ? '❌ 도전 실패 (재도전 가능)'
-    : '👆 클릭해서 도전!';
-  document.getElementById('tt-status').textContent = st;
-  tt.style.display='block';
-  moveTooltip(e);
+function showTooltip(e,rk){
+  const r=REGIONS[rk]; if(!r) return;
+  const tt=document.getElementById('tooltip');
+  document.getElementById('tt-name').textContent=r.name;
+  document.getElementById('tt-energy').textContent=conquered[rk]==='ok'?r.icon+' '+r.energy:'❓ 어떤 에너지일까?';
+  const st=conquered[rk]==='ok'?'✅ 정복 완료!':conquered[rk]==='giveup'?'💀 정복 불가 (3회 실패)':conquered[rk]==='fail'?'❌ 도전 실패 (재도전 가능)':'👆 클릭해서 도전!';
+  document.getElementById('tt-status').textContent=st;
+  tt.style.display='block'; moveTooltip(e);
 }
-function moveTooltip(e){ const tt=document.getElementById('tooltip'); tt.style.left=(e.clientX+12)+'px'; tt.style.top=(e.clientY-10)+'px'; }
-function hideTooltip(){ document.getElementById('tooltip').style.display='none'; }
+function moveTooltip(e){const tt=document.getElementById('tooltip');tt.style.left=(e.clientX+12)+'px';tt.style.top=(e.clientY-10)+'px';}
+function hideTooltip(){document.getElementById('tooltip').style.display='none';}
 
-function onRegionClick(rk, el){
+function onRegionClick(rk,el){
   if(activeRegion) return;
-  if(conquered[rk]==='giveup') return; // 정복 불가 지역
-  if(conquered[rk]==='ok') return;     // 이미 정복한 지역
-  const r = REGIONS[rk];
-  if(!r) return;
-  activeRegion = rk;
-  el.classList.add('active-q');
-  startRegionQuiz(rk, r);
+  if(conquered[rk]==='ok'||conquered[rk]==='giveup') return;
+  const r=REGIONS[rk]; if(!r) return;
+  activeRegion=rk; el.classList.add('active-q');
+  startRegionQuiz(rk,r);
 }
 
-function startRegionQuiz(rk, r){
-  const factPool = shu([...(QUESTIONS[r.energy]||[])]).slice(0,2);
-  const qList = [
-    { mode:'hint2energy', fact:null },
-    { mode:'energy2fact', fact:factPool[0] },
-    { mode:'energy2fact', fact:factPool[1] },
-  ];
-  // 도전 횟수 유지 (재도전 시 이전 횟수 이어받기)
-  const attempts = (quizState && quizState.rk === rk) ? quizState.attempts + 1 : 1;
-  quizState = { rk, r, qs:qList, idx:0, correct:0, results:[], energyRevealed:false, attempts };
+function startRegionQuiz(rk,r){
+  const factPool=shu([...(QUESTIONS[r.energy]||[])]).slice(0,2);
+  const qList=[{mode:'hint2energy',fact:null},{mode:'energy2fact',fact:factPool[0]},{mode:'energy2fact',fact:factPool[1]}];
+  const attempts=(quizState&&quizState.rk===rk)?quizState.attempts+1:1;
+  quizState={rk,r,qs:qList,idx:0,correct:0,results:[],energyRevealed:false,attempts};
   showQuizModal();
 }
 
 function showQuizModal(){
-  const {r, qs, idx, results} = quizState;
-  const q = qs[idx];
-
-  const modal = document.createElement('div');
+  const {r,qs,idx,results}=quizState;
+  const q=qs[idx];
+  const modal=document.createElement('div');
   modal.className='modal-bg'; modal.id='quiz-modal';
-
-  let bodyHTML = '';
-  if(q.mode === 'hint2energy'){
-    // 지역 힌트 보여주고 에너지 맞추기
-    const correct = r.energy;
-    const wrongs = shu(ALL_ENERGIES.filter(e=>e!==correct)).slice(0,3);
-    const opts = shu([correct,...wrongs]);
-    bodyHTML = `
+  let bodyHTML='';
+  if(q.mode==='hint2energy'){
+    const correct=r.energy;
+    const wrongs=shu(ALL_ENERGIES.filter(e=>e!==correct)).slice(0,3);
+    const opts=shu([correct,...wrongs]);
+    bodyHTML=`
       <div class="q-type-tag tag-설치">지역 힌트</div>
       <div class="q-label">${idx+1}/3번 · 이 지역의 대표 신재생 에너지는?</div>
       <div class="q-text">📍 ${r.name}<br><span style="font-size:13px;color:var(--text-sub);font-weight:400">${r.hint}</span></div>
@@ -537,171 +488,124 @@ function showQuizModal(){
         ${opts.map(o=>`<button class="opt" onclick="checkHint2Energy(this,'${o}','${correct}')">${ENERGY_ICONS[o]||''} ${o}</button>`).join('')}
       </div>`;
   } else {
-    // 에너지 보여주고 특징 맞추기 (에너지는 첫 문제 이후 공개)
-    const fact = q.fact;
-    const correct = fact.q;
-    const energyLabel = quizState.energyRevealed
-      ? `${r.icon} ${r.energy}`
-      : `${r.icon} ???`;
-    // 같은 타입의 다른 에너지 설명을 오답으로
-    let cands = [];
-    ALL_ENERGIES.filter(e=>e!==r.energy).forEach(e=>{
-      (QUESTIONS[e]||[]).filter(f=>f.type===fact.type).forEach(f=>cands.push(f.q));
-    });
-    if(cands.length<3){
-      ALL_ENERGIES.filter(e=>e!==r.energy).forEach(e=>{
-        (QUESTIONS[e]||[]).forEach(f=>cands.push(f.q));
-      });
-    }
-    const wrongs = shu([...new Set(cands)]).slice(0,3);
-    const opts = shu([correct,...wrongs]);
-    bodyHTML = `
+    const fact=q.fact;
+    const correct=fact.q;
+    const energyLabel=quizState.energyRevealed?`${r.icon} ${r.energy}`:`${r.icon} ???`;
+    let cands=[];
+    ALL_ENERGIES.filter(e=>e!==r.energy).forEach(e=>(QUESTIONS[e]||[]).filter(f=>f.type===fact.type).forEach(f=>cands.push(f.q)));
+    if(cands.length<3) ALL_ENERGIES.filter(e=>e!==r.energy).forEach(e=>(QUESTIONS[e]||[]).forEach(f=>cands.push(f.q)));
+    const wrongs=shu([...new Set(cands)]).slice(0,3);
+    const opts=shu([correct,...wrongs]);
+    bodyHTML=`
       <div class="q-type-tag ${TAG_CLASS[fact.type]||''}">${fact.type}</div>
       <div class="q-label">${idx+1}/3번 · 이 에너지의 ${fact.type} 설명으로 올바른 것은?</div>
       <div class="q-text" style="font-size:20px">${energyLabel}</div>
       <div class="opts" id="modal-opts">
-        ${opts.map(o=>`<button class="opt" onclick="checkEnergy2Fact(this,${o===correct},'${correct.replace(/'/g,"\\'")}')" data-q="${o.replace(/"/g,'&quot;')}">${o}</button>`).join('')}
+        ${opts.map(o=>`<button class="opt" onclick="checkEnergy2Fact(this,${o===correct},'${correct.replace(/'/g,"\\'")}','${fact.type}')">${o}</button>`).join('')}
       </div>`;
   }
-
   modal.innerHTML=`
     <div class="modal">
       <div class="modal-head">
         <div class="modal-region">${r.name}</div>
-        <div class="modal-energy">❓ 이 지역의 에너지는?</div>
+        <div class="modal-energy" id="modal-energy-title">❓ 이 지역의 에너지는?</div>
         <div class="modal-prog">${qs.map((_,i)=>`<div class="prog-dot ${i<idx?(results[i]?'ok':'ng'):(i===idx?'cur':'')}"></div>`).join('')}</div>
       </div>
-      <div class="modal-body">
-        ${bodyHTML}
-        <div class="modal-fb" id="modal-fb"></div>
-        <button class="modal-next" id="modal-next" onclick="nextQuizQ()"></button>
-      </div>
+      <div class="modal-body">${bodyHTML}<div class="modal-fb" id="modal-fb"></div><button class="modal-next" id="modal-next" onclick="nextQuizQ()"></button></div>
     </div>`;
   document.body.appendChild(modal);
 }
 
-function checkHint2Energy(btn, selected, correct){
-  checkModalAnswer(btn, selected===correct, correct);
-}
+function checkHint2Energy(btn,selected,correct){checkModalAnswer(btn,selected===correct,correct,true);}
+function checkEnergy2Fact(btn,isOk,correct){checkModalAnswer(btn,isOk,correct,false);}
 
-function checkEnergy2Fact(btn, isOk, correct){
-  checkModalAnswer(btn, isOk, correct);
-}
-
-function checkModalAnswer(btn, isOk, correctKey){
+function checkModalAnswer(btn,isOk,correctKey,isFirstQ){
   const fb=document.getElementById('modal-fb');
   document.querySelectorAll('#quiz-modal .opt').forEach(b=>b.disabled=true);
-  const isFirstQ = quizState.idx === 0 && quizState.qs[0].mode === 'hint2energy';
   if(isOk){
     btn.classList.add('ok');
-    quizState.correct++;
-    quizState.results.push(true);
-    totalCorrect++;
-    document.getElementById('total-correct').textContent=totalCorrect;
+    quizState.correct++; quizState.results.push(true);
+    totalCorrect++; document.getElementById('total-correct').textContent=totalCorrect;
     spawnParticles(btn);
-    // 첫 문제 정답 시 에너지 공개
     if(isFirstQ){
-      quizState.energyRevealed = true;
-      const r = quizState.r;
-      document.querySelector('.modal-energy').textContent = r.icon+' '+r.energy+' 정답! 🎉';
-      document.querySelector('.modal-energy').style.color='var(--green)';
+      quizState.energyRevealed=true;
+      const r=quizState.r;
+      document.getElementById('modal-energy-title').textContent=r.icon+' '+r.energy+' 정답! 🎉';
+      document.getElementById('modal-energy-title').style.color='var(--green)';
       fb.textContent='✅ 정답! 에너지가 공개됐어요!';
-    } else {
-      fb.textContent='✅ 정답!';
-    }
+    } else { fb.textContent='✅ 정답!'; }
     fb.className='modal-fb show ok';
   } else {
-    btn.classList.add('ng');
-    fb.textContent='❌ 오답!';
-    fb.className='modal-fb show ng';
-    quizState.results.push(false);
-    // 첫 문제 오답 시에도 에너지 공개 (이후 문제를 위해)
+    btn.classList.add('ng'); quizState.results.push(false);
     if(isFirstQ){
-      quizState.energyRevealed = true;
-      const r = quizState.r;
-      document.querySelector('.modal-energy').textContent = r.icon+' '+r.energy;
+      quizState.energyRevealed=true;
+      const r=quizState.r;
+      document.getElementById('modal-energy-title').textContent=r.icon+' '+r.energy;
     }
     const all=[...document.querySelectorAll('#quiz-modal .opt')];
-    const cb=all.find(b=>b!==btn&&(b.textContent.includes(correctKey)||(b.dataset.q&&b.dataset.q===correctKey)));
+    const cb=all.find(b=>b!==btn&&b.textContent.includes(correctKey.slice(0,10)));
     if(cb) cb.classList.add('reveal');
+    fb.textContent='❌ 오답!';
+    fb.className='modal-fb show ng';
   }
   totalAnswered++;
   const nb=document.getElementById('modal-next');
   nb.className='modal-next show';
-  nb.textContent = quizState.idx===quizState.qs.length-1 ? '결과 확인 →' : '다음 문제 →';
+  nb.textContent=quizState.idx===quizState.qs.length-1?'결과 확인 →':'다음 문제 →';
 }
 
 function nextQuizQ(){
   quizState.idx++;
-  if(quizState.idx >= quizState.qs.length){
-    closeModal();
-    finishRegion();
-  } else {
-    closeModal();
-    showQuizModal();
-  }
+  if(quizState.idx>=quizState.qs.length){closeModal();finishRegion();}
+  else{closeModal();showQuizModal();}
 }
 
-function closeModal(){
-  const m=document.getElementById('quiz-modal');
-  if(m) m.remove();
-}
+function closeModal(){const m=document.getElementById('quiz-modal');if(m)m.remove();}
 
 function finishRegion(){
-  const {rk, r, correct, qs, attempts} = quizState;
-  const success = correct >= 3;
-  const giveUp = !success && attempts >= 3;
-  const el = document.getElementById('r-'+rk);
-
+  const {rk,r,correct,qs,attempts}=quizState;
+  const success=correct>=3;
+  const giveUp=!success&&attempts>=3;
+  const el=document.getElementById('r-'+rk);
   if(success){
     conquered[rk]='ok';
-    if(el){ el.classList.remove('active-q','failed'); el.classList.add('conquered'); }
-    addPin(rk, r);
-    spawnRegionParticles();
+    if(el){el.classList.remove('active-q','failed','giveup');el.classList.add('conquered');}
+    addPin(rk,r); spawnRegionParticles();
   } else {
-    conquered[rk] = giveUp ? 'giveup' : 'fail';
-    if(el){ el.classList.remove('active-q'); el.classList.add('failed'); }
+    conquered[rk]=giveUp?'giveup':'fail';
+    if(el){el.classList.remove('active-q');el.classList.add(giveUp?'giveup':'failed');}
   }
-
-  showResultModal(success, giveUp, correct, qs.length, r, attempts);
-
-  const cnt = Object.values(conquered).filter(v=>v==='ok').length;
+  showResultModal(success,giveUp,correct,qs.length,r,attempts);
+  const cnt=Object.values(conquered).filter(v=>v==='ok').length;
   document.getElementById('conquered-cnt').textContent=cnt;
   activeRegion=null;
-
-  if(cnt >= REGION_KEYS.length) setTimeout(showFinal, 1200);
+  if(cnt>=REGION_KEYS.length) setTimeout(showFinal,1200);
 }
 
-function addPin(rk, r){
-  const [px,py] = r.pin;
+function addPin(rk,r){
+  const [px,py]=r.pin;
   const pins=document.getElementById('pins');
   const t=document.createElementNS('http://www.w3.org/2000/svg','text');
   t.setAttribute('x',px); t.setAttribute('y',py-14);
-  t.setAttribute('class','map-pin'); t.textContent=r.icon;
-  pins.appendChild(t);
+  t.setAttribute('class','map-pin'); t.setAttribute('font-size','18');
+  t.textContent=r.icon; pins.appendChild(t);
 }
 
-function showResultModal(success, giveUp, correct, total, r, attempts){
+function showResultModal(success,giveUp,correct,total,r,attempts){
   const modal=document.createElement('div');
   modal.className='modal-bg'; modal.id='result-modal';
-
-  let emoji, title, sub, buttons;
+  let emoji,title,sub,buttons;
   if(success){
-    emoji='🎉'; title=r.name+' 정복!';
-    sub=`${total}문제 중 ${correct}개 정답 · 완벽해요!`;
+    emoji='🎉'; title=r.name+' 정복!'; sub=`${total}문제 중 ${correct}개 정답 · 완벽해요!`;
     buttons=`<button class="rm-btn continue" onclick="closeResultModal()">계속 탐험하기 🗺️</button>`;
   } else if(giveUp){
-    emoji='💀'; title='정복 불가...';
-    sub=`3번 도전했지만 실패했어요. 이 지역은 정복할 수 없어요.`;
+    emoji='💀'; title='정복 불가...'; sub=`3번 도전했지만 실패했어요. 이 지역은 정복할 수 없어요.`;
     buttons=`<button class="rm-btn continue" onclick="closeResultModal()">계속 탐험하기 🗺️</button>`;
   } else {
-    emoji='😢'; title='아쉽게 실패...';
-    sub=`${total}문제 중 ${correct}개 정답 · 3개 모두 맞춰야 정복 가능 (${attempts}/3회 도전)`;
-    buttons=`
-      <button class="rm-btn continue" onclick="closeResultModal()">계속 탐험하기 🗺️</button>
-      <button class="rm-btn home" style="margin-top:8px;background:var(--surface2);color:var(--accent2);border:1px solid var(--accent2)40" onclick="retryRegion()">🔄 이 지역 다시 도전하기</button>`;
+    emoji='😢'; title='아쉽게 실패...'; sub=`${total}문제 중 ${correct}개 정답 · 3개 모두 맞춰야 정복 가능 (${attempts}/3회 도전)`;
+    buttons=`<button class="rm-btn continue" onclick="closeResultModal()">계속 탐험하기 🗺️</button>
+      <button class="rm-btn retry" onclick="retryRegion()">🔄 이 지역 다시 도전하기</button>`;
   }
-
   modal.innerHTML=`
     <div class="result-modal">
       <div class="rm-emoji">${emoji}</div>
@@ -717,18 +621,13 @@ function showResultModal(success, giveUp, correct, total, r, attempts){
   document.body.appendChild(modal);
 }
 
-function closeResultModal(){
-  const m=document.getElementById('result-modal');
-  if(m) m.remove();
-  activeRegion=null;
-}
+function closeResultModal(){const m=document.getElementById('result-modal');if(m)m.remove();activeRegion=null;}
 
 function retryRegion(){
-  const m=document.getElementById('result-modal');
-  if(m) m.remove();
-  const {rk, r} = quizState;
-  activeRegion = rk;
-  startRegionQuiz(rk, r);
+  const m=document.getElementById('result-modal'); if(m)m.remove();
+  const {rk,r}=quizState;
+  activeRegion=rk;
+  startRegionQuiz(rk,r);
 }
 
 function showFinal(){
@@ -736,8 +635,7 @@ function showFinal(){
   document.getElementById('fs-c').textContent=totalCorrect;
   document.getElementById('fs-r').textContent=cnt;
   document.getElementById('fs-t').textContent=totalAnswered;
-  document.getElementById('final-sub').textContent=
-    `총 ${totalAnswered}문제에 도전해 ${totalCorrect}개 정답, ${cnt}개 지역을 정복했어요!`;
+  document.getElementById('final-sub').textContent=`총 ${totalAnswered}문제에 도전해 ${totalCorrect}개 정답, ${cnt}개 지역을 정복했어요!`;
   showScreen('screen-final');
 }
 
@@ -748,11 +646,9 @@ function spawnParticles(btn){
   const pc=document.getElementById('particles');
   for(let i=0;i<14;i++){
     const p=document.createElement('div'); p.className='particle';
-    const sz=4+Math.random()*6, angle=Math.random()*360, dist=50+Math.random()*100;
-    const dur=.4+Math.random()*.4;
+    const sz=4+Math.random()*6, angle=Math.random()*360, dist=50+Math.random()*100, dur=.4+Math.random()*.4;
     p.style.cssText=`width:${sz}px;height:${sz}px;left:${cx}px;top:${cy}px;background:${colors[Math.floor(Math.random()*colors.length)]};--tx:${Math.cos(angle*Math.PI/180)*dist}px;--ty:${Math.sin(angle*Math.PI/180)*dist}px;--dur:${dur}s`;
-    pc.appendChild(p);
-    setTimeout(()=>p.remove(),dur*1000+100);
+    pc.appendChild(p); setTimeout(()=>p.remove(),dur*1000+100);
   }
 }
 
@@ -761,12 +657,10 @@ function spawnRegionParticles(){
   const pc=document.getElementById('particles');
   for(let i=0;i<30;i++){
     const p=document.createElement('div'); p.className='particle';
-    const sz=5+Math.random()*8;
-    const cx=window.innerWidth/2, cy=window.innerHeight/2;
+    const sz=5+Math.random()*8, cx=window.innerWidth/2, cy=window.innerHeight/2;
     const angle=Math.random()*360, dist=80+Math.random()*160, dur=.5+Math.random()*.6;
     p.style.cssText=`width:${sz}px;height:${sz}px;left:${cx}px;top:${cy}px;background:${colors[Math.floor(Math.random()*colors.length)]};--tx:${Math.cos(angle*Math.PI/180)*dist}px;--ty:${Math.sin(angle*Math.PI/180)*dist}px;--dur:${dur}s`;
-    pc.appendChild(p);
-    setTimeout(()=>p.remove(),dur*1000+100);
+    pc.appendChild(p); setTimeout(()=>p.remove(),dur*1000+100);
   }
 }
 </script>
