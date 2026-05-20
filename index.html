@@ -416,14 +416,14 @@ function startMap(){
   conquered={}; totalCorrect=0; totalAnswered=0; activeRegion=null;
   document.getElementById('conquered-cnt').textContent='0';
   document.getElementById('total-correct').textContent='0';
-  // 나라 색 초기화
   document.querySelectorAll('.country').forEach(el=>{
     el.classList.remove('conquered','failed','active-q');
     el.style.fill='';
   });
   document.getElementById('pins').innerHTML='';
   showScreen('screen-map');
-  setupMap();
+  // 화면 전환 후 실제 크기 기준으로 레이아웃 재계산
+  setTimeout(()=>{ setupMap(); }, 50);
 }
 
 function setupMap(){
